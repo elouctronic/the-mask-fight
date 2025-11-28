@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Login Battle Royale IRL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Fond sombre avec dégradé */
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top left, #0f0f0f, #000000);
+      color: #eee;
+    }
+
+    /* Loader plein écran */
+    #loader {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      z-index: 100;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(255,255,255,0.2);
+      border-top: 6px solid #00ffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Conteneur du formulaire */
+    .login-container {
+      background: rgba(20, 20, 20, 0.9);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+      width: 320px;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+      display: none; /* caché au départ */
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 28px;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+    }
+
+    p {
+      font-size: 14px;
+      margin-bottom: 20px;
+      color: #aaa;
+    }
+
+    /* Champs de saisie */
+    input {
+      display: block;
+      width: 100%;
+      margin: 12px 0;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #111;
+      color: #eee;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #00ffff;
+      box-shadow: 0 0 12px #00ffff;
+      background: #1a1a1a;
+    }
+
+    /* Bouton stylé */
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff00cc, #3333ff);
+      color: #fff;
+      text-shadow: 0 0 5px #000;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #ff00cc, 0 0 30px #3333ff;
+    }
+
+    /* Animation d’apparition */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader -->
+  <div id="loader">
+    <div class="spinner"></div>
+    <p>Connexion au serveur…</p>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="login-container" id="loginForm">
+    <h1>Connexion Binôme</h1>
+    <p>Entrez votre identifiant et mot de passe pour accéder au jeu.</p>
+
+    <input id="duoId" placeholder="Identifiant (ex: violette)">
+    <input id="password" type="password" placeholder="Mot de passe">
+    <button onclick="login()">Se connecter</button>
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://ton-backend.onrender.com"; // ⚠️ mets ton URL Render
+
+    // Ping backend pour le réveiller
+    (async () => {
+      try {
+        await fetch(`${BACKEND_URL}/ping`, { cache: "no-store" });
+        // Backend réveillé → afficher le formulaire
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("loginForm").style.display = "block";
+      } catch (e) {
+        document.querySelector("#loader p").textContent = "Impossible de joindre le serveur…";
+      }
+    })();
+
+    function login() {
+      const duoId = document.getElementById("duoId").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!duoId || !password) {
+        alert("Veuillez entrer un identifiant et un mot de passe.");
+        return;
+      }
+
+      // Sauvegarde dans localStorage
+      localStorage.setItem("duoId", duoId);
+      localStorage.setItem("password", password);
+
+      // Redirection vers la page de jeu
+      window.location.href = "dashboard.html";
+    }
+  </script>
+</body>
+</html>

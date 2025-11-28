@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Admin - Battle Royale IRL</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    button { padding: 15px; font-size: 18px; cursor: pointer; }
+    #status { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Interface Admin</h1>
+  <button onclick="resetLives()">🔄 Réinitialiser toutes les vies à 3</button>
+  <div id="status"></div>
+
+  <script>
+    const BACKEND_URL = "http://localhost:3000"; // ⚠️ change en URL Render si déployé
+
+    async function resetLives() {
+      const res = await fetch(`${BACKEND_URL}/api/reset`, {
+        method: "POST"
+      });
+      const data = await res.json();
+      document.getElementById("status").innerText = data.message || data.error;
+    }
+  </script>
+</body>
+</html>

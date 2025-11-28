@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Battle Royale IRL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style id="dynamic-style">
+    /* Styles de base */
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #000;
+      color: #eee;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+    
+    h1 { 
+      text-align: center; 
+      margin: 15px 0;
+      font-size: 1.5rem;
+    }
+    
+    h2 { 
+      margin-top: 20px; 
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+    }
+    
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    
+    .player {
+      border: 1px solid #444;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      background: rgba(20,20,20,0.8);
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    button {
+      margin-top: 8px;
+      padding: 12px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 8px;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      transition: 0.3s;
+      min-height: 44px; /* Taille minimale pour les écrans tactiles */
+    }
+    
+    #notifications { 
+      margin-top: 20px; 
+      width: 100%;
+      max-width: 600px;
+    }
+    
+    .notif {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      font-weight: bold;
+      text-align: center;
+    }
+    
+    /* Disposition des boutons pour mobile */
+    .player-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .player-actions button {
+      flex: 1;
+      min-width: 120px;
+    }
+    
+    /* Améliorations pour les écrans plus larges */
+    @media (min-width: 768px) {
+      body {
+        padding: 0 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+        margin-top: 25px;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+        margin-top: 30px;
+      }
+      
+      .player {
+        padding: 15px;
+        margin: 10px 0;
+      }
+      
+      .player-actions {
+        flex-wrap: nowrap;
+      }
+    }
+    
+    /* Améliorations pour les très petits écrans */
+    @media (max-width: 360px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+      
+      h2 {
+        font-size: 1.1rem;
+      }
+      
+      button {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 id="duoName"></h1>
+
+  <h2>Mon binôme</h2>
+  <div id="myTeam"></div>
+
+  <h2>Autres équipes</h2>
+  <div id="otherTeams"></div>
+
+  <h3>Notifications</h3>
+  <div id="notifications"></div>
+
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <script>
+    const BACKEND_URL = "http://localhost:3000"; // ⚠️ change en URL Render si déployé
+    const duoId = (localStorage.getItem("duoId") || "").trim();
+    let socket;
+
+    // Sécurité: si pas de duoId, on renvoie vers le login
+    if (!duoId) {
+      alert("Aucun binôme détecté, retour au login.");
+      window.location.href = "index.html";
+    }
+
+    // Thèmes par équipe
+    const themes = {
+      violette: { background: "linear-gradient(135deg, #6a0dad, #000000)", button: "linear-gradient(135deg, #a64ca6, #6a0dad)", notif: "#a64ca6" },
+      bleue:   { background: "linear-gradient(135deg, #1e3c72, #000000)", button: "linear-gradient(135deg, #2575fc, #1e3c72)", notif: "#2575fc" },
+      rouge:   { background: "linear-gradient(135deg, #8b0000, #000000)", button: "linear-gradient(135deg, #ff0000, #8b0000)", notif: "#ff4444" },
+      orange:  { background: "linear-gradient(135deg, #ff8c00, #000000)", button: "linear-gradient(135deg, #ffa500, #ff8c00)", notif: "#ffa500" },
+      verte:   { background: "linear-gradient(135deg, #006400, #000000)", button: "linear-gradient(135deg, #00ff00, #006400)", notif: "#00ff00" }
+    };
+
+    function applyTheme(team) {
+      const style = document.getElementById("dynamic-style");
+      const theme = themes[team.toLowerCase()];
+      if (theme) {
+        style.innerHTML += `
+          body { background: ${theme.background}; }
+          button { background: ${theme.button}; }
+          button:hover { filter: brightness(1.2); }
+          .notif { background: ${theme.notif}; color: #000; }
+        `;
+      }
+    }
+
+    async function loadPlayers() {
+      const res = await fetch(`${BACKEND_URL}/api/players`);
+      const players = await res.json();
+
+      const myDiv = document.getElementById("myTeam");
+      const otherDiv = document.getElementById("otherTeams");
+      myDiv.innerHTML = "";
+      otherDiv.innerHTML = "";
+
+      // Grouper par binôme
+      const grouped = {};
+      players.forEach(p => {
+        const key = (p.duo || "").trim();
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(p);
+      });
+
+      // Trouver la clé correspondant à mon équipe (comparaison en minuscules)
+      const myTeamKey = Object.keys(grouped).find(
+        k => k.toLowerCase() === duoId.toLowerCase()
+      );
+
+      // Mon binôme avec boutons
+      if (myTeamKey) {
+        grouped[myTeamKey].forEach(p => {
+          const container = document.createElement("div");
+          container.className = "player";
+          container.innerHTML = `
+            <h3>${p.name}</h3>
+            <p>Vies restantes: ${p.lives}</p>
+            ${p.lives > 0 ? `
+              <div class="player-actions">
+                <button onclick="hit('${p.id}')">Touché</button>
+                <button onclick="heal('${p.id}')">Heal</button>
+              </div>
+            ` : "<p>Éliminé 💀</p>"}
+          `;
+          myDiv.appendChild(container);
+        });
+        // Supprimer mon équipe du regroupement
+        delete grouped[myTeamKey];
+      }
+
+      // Autres équipes sans boutons
+      Object.keys(grouped).forEach(team => {
+        const teamDiv = document.createElement("div");
+        teamDiv.innerHTML = `<h3>${team}</h3>`;
+        grouped[team].forEach(p => {
+          const container = document.createElement("div");
+          container.className = "player";
+          container.innerHTML = `
+            <strong>${p.name}</strong> — Vies restantes: ${p.lives}
+            ${p.lives === 0 ? " 💀" : ""}
+          `;
+          teamDiv.appendChild(container);
+        });
+        otherDiv.appendChild(teamDiv);
+      });
+    }
+
+    async function hit(playerId) {
+      const res = await fetch(`${BACKEND_URL}/api/touche`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId, duoId })
+      });
+      const data = await res.json();
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+      loadPlayers();
+    }
+
+    async function heal(playerId) {
+      const res = await fetch(`${BACKEND_URL}/api/heal`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId, duoId })
+      });
+      const data = await res.json();
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+      loadPlayers();
+    }
+
+    function initSocket() {
+      socket = io(BACKEND_URL, { transports: ["websocket"] });
+      socket.on("notif", (payload) => {
+        let message = "";
+
+        if (payload.type === "hit") {
+          message = `⚡ ${payload.duo} - ${payload.player} a perdu une vie (reste ${payload.lives})`;
+        } else if (payload.type === "eliminated") {
+          message = `💀 ${payload.duo} - ${payload.player} est éliminé !`;
+        } else if (payload.type === "heal") {
+          message = `💚 ${payload.duo} - ${payload.player} a été soigné (vies: ${payload.lives})`;
+        } else if (payload.type === "reset") {
+          message = `🔄 ${payload.message}`;
+        }
+
+        if (message) {
+          const div = document.createElement("div");
+          div.className = "notif";
+          div.textContent = message;
+          document.getElementById("notifications").prepend(div);
+
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Battle Royale IRL", {
+              body: message,
+              icon: "/icon.png"
+            });
+          }
+
+          if ((payload.type === "hit" || payload.type === "eliminated") && navigator.vibrate) {
+            navigator.vibrate([500, 200, 500]);
+          }
+
+          loadPlayers();
+        }
+      });
+    }
+
+    // Initialisation
+    (async () => {
+      applyTheme(duoId);
+      document.getElementById("duoName").innerText = `Équipe ${duoId}`;
+      await loadPlayers();
+      initSocket();
+
+      // auto-ping toutes les minutes pour garder le serveur actif
+      setInterval(async () => {
+        try {
+          await fetch(`${BACKEND_URL}/ping`);
+          console.log("Ping envoyé pour garder le serveur actif");
+        } catch (e) {
+          console.error("Erreur de ping", e);
+        }
+      }, 60000);
+    })();
+  </script>
+</body>
+</html>
