@@ -1,5 +1,6 @@
 const express = require("express");
 const http = require("http");
+const path = require("path");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const { Pool } = require("pg");
@@ -10,6 +11,22 @@ const io = new Server(server, { cors: { origin: "*" } });
 
 app.use(cors());
 app.use(express.json());
+
+// ----------------------
+// Servir le frontend statique
+// ----------------------
+app.use(express.static(path.join(__dirname)));
+
+// Routes pour accéder directement aux pages
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "dashboard.html"));
+});
+app.get("/admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "admin.html"));
+});
 
 // ----------------------
 // Connexion PostgreSQL
