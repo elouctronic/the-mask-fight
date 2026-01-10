@@ -15,7 +15,7 @@
   <div id="status"></div>
 
   <script>
-    const BACKEND_URL = "https://the-mask-fight.onrender.com";
+    const BACKEND_URL = "postgresql://postgres:Lcemakame19034578347.@db.yvmxsyohvsxybqmtycaf.supabase.co:5432/postgres";
 
     async function resetLives() {
       const res = await fetch(`${BACKEND_URL}/api/reset`, {
