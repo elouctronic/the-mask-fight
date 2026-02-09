@@ -65,12 +65,12 @@ async function initDB() {
     ["violette_p1", "Violette", "Elouan", 3],
     ["violette_p2", "Violette", "Maxence M.", 3],
     ["bleue_p1", "Bleue", "Yannis", 3],
-    ["bleue_p2", "Bleue", "Lucka", 3],
-    ["rouge_p1", "Rouge", "Jacques", 3],
-    ["rouge_p2", "Rouge", "Emile", 3],
-    ["orange_p1", "Orange", "Paul", 3],
+    ["bleue_p2", "Bleue", "Jacques", 3],
+    ["rouge_p1", "Bolchevik", "Paul", 3],
+    ["rouge_p2", "Bolchevik", "Emile", 3],
+    ["orange_p1", "Orange", "Arthur", 3],
     ["orange_p2", "Orange", "Gabin", 3],
-    ["verte_p1", "Verte", "Arthur", 3],
+    ["verte_p1", "Verte", "Lucka", 3],
     ["verte_p2", "Verte", "Maxence B.", 3],
   ];
 
