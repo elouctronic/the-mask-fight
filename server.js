@@ -74,7 +74,7 @@ async function initDB() {
     ["verte_p2", "Verte", "Maxence B.", 3],
   ];
 
-  const duos = ["Violette", "Bleue", "Rouge", "Orange", "Verte"];
+  const duos = ["Violette", "Bleue", "Bolchevik", "Orange", "Verte"];
 
   for (const j of joueurs) {
     await pool.query(
