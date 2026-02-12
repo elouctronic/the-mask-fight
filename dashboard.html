@@ -34,23 +34,21 @@
       background: transparent;
     }
 
-    h1 { text-align: center; margin: 15px 0; font-size: 1.8rem; font-weight: 700; }
-    h2 { margin-top: 20px; margin-bottom: 10px; font-size: 1.4rem; }
-    h3 { margin-top: 20px; margin-bottom: 10px; font-size: 1.2rem; }
+    h1 { text-align: center; margin: 15px 0; font-size: 1.5rem; }
+    h2 { margin-top: 20px; margin-bottom: 10px; font-size: 1.3rem; }
+    h3 { margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
 
     .player {
       border: 1px solid #444;
-      padding: 14px;
-      margin: 10px 0;
-      border-radius: 10px;
-      background: rgba(20,20,20,0.85);
-      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      background: rgba(20,20,20,0.8);
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
       width: 100%;
       box-sizing: border-box;
-      backdrop-filter: blur(4px);
     }
 
-    /* Boutons stylés */
     button {
       margin-top: 8px;
       padding: 12px 15px;
@@ -58,40 +56,10 @@
       cursor: pointer;
       margin-right: 8px;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       color: #fff;
-      transition: 0.25s ease;
+      transition: 0.3s;
       min-height: 44px;
-      font-weight: 600;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Effet ripple */
-    button::after {
-      content: "";
-      position: absolute;
-      width: 0;
-      height: 0;
-      background: rgba(255,255,255,0.4);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      top: var(--y);
-      left: var(--x);
-      opacity: 0;
-      transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease;
-    }
-
-    button:active::after {
-      width: 200px;
-      height: 200px;
-      opacity: 1;
-    }
-
-    /* Hover 3D */
-    button:hover {
-      transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
 
     #notifications { margin-top: 20px; width: 100%; max-width: 600px; }
@@ -107,7 +75,7 @@
     .player-actions button { flex: 1; min-width: 120px; }
   </style>
 
-  <!-- Style dynamique -->
+  <!-- Style dynamique (thèmes + animations) -->
   <style id="dynamic-style"></style>
 </head>
 
@@ -174,17 +142,17 @@
       },
 
       SpawnKill: {
-        background: "linear-gradient(135deg, #3a3a3a, #000000)",
+        background: "linear-gradient(135deg, #444444, #000000)",
         button: "#ffffff",
         notif: "#ffffff",
         text: "#000",
         animation: `
           #animated-bg {
-            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(0,0,0,0.12));
-            background-size: 300% 300%;
-            animation: glasswave 7s infinite ease-in-out;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(0,0,0,0.15));
+            background-size: 200% 200%;
+            animation: spawnkillWave 6s ease-in-out infinite;
           }
-          @keyframes glasswave {
+          @keyframes spawnkillWave {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
@@ -228,4 +196,128 @@
     };
 
     function applyTheme(team) {
-      const theme =
+      const theme = themes[team];
+      if (!theme) return;
+
+      const dyn = document.getElementById("dynamic-style");
+      dyn.innerHTML = `
+        body { background: ${theme.background}; color: ${theme.text}; }
+        button { background: ${theme.button}; color: ${theme.text}; }
+        .notif { background: ${theme.notif}; color: #000; }
+        ${theme.animation}
+      `;
+    }
+
+    /* --- Le reste du code (inchangé) --- */
+
+    async function loadPlayers() {
+      const res = await fetch(`${BACKEND_URL}/api/players`);
+      const players = await res.json();
+
+      const myDiv = document.getElementById("myTeam");
+      const otherDiv = document.getElementById("otherTeams");
+      myDiv.innerHTML = "";
+      otherDiv.innerHTML = "";
+
+      const grouped = {};
+      players.forEach(p => {
+        const key = (p.duo || "").trim();
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(p);
+      });
+
+      const myTeamKey = Object.keys(grouped).find(
+        k => k.toLowerCase() === duoId.toLowerCase()
+      );
+
+      if (myTeamKey) {
+        grouped[myTeamKey].forEach(p => {
+          const container = document.createElement("div");
+          container.className = "player";
+          container.innerHTML = `
+            <h3>${p.name}</h3>
+            <p>Vies restantes: ${p.lives}</p>
+            ${p.lives > 0 ? `
+              <div class="player-actions">
+                <button onclick="hit('${p.id}')">Touché</button>
+                <button onclick="heal('${p.id}')">Heal</button>
+              </div>
+            ` : "<p>Éliminé 💀</p>"}
+          `;
+          myDiv.appendChild(container);
+        });
+        delete grouped[myTeamKey];
+      }
+
+      Object.keys(grouped).forEach(team => {
+        const teamDiv = document.createElement("div");
+        teamDiv.innerHTML = `<h3>${team}</h3>`;
+        grouped[team].forEach(p => {
+          const container = document.createElement("div");
+          container.className = "player";
+          container.innerHTML = `
+            <strong>${p.name}</strong> — Vies restantes: ${p.lives}
+            ${p.lives === 0 ? " 💀" : ""}
+          `;
+          teamDiv.appendChild(container);
+        });
+        otherDiv.appendChild(teamDiv);
+      });
+    }
+
+    async function hit(playerId) {
+      const res = await fetch(`${BACKEND_URL}/api/touche`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId, duoId })
+      });
+      const data = await res.json();
+      if (data.error) return alert(data.error);
+      loadPlayers();
+    }
+
+    async function heal(playerId) {
+      const res = await fetch(`${BACKEND_URL}/api/heal`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId, duoId })
+      });
+      const data = await res.json();
+      if (data.error) return alert(data.error);
+      loadPlayers();
+    }
+
+    function initSocket() {
+      socket = io(BACKEND_URL, { transports: ["websocket"] });
+      socket.on("notif", (payload) => {
+        let message = "";
+
+        if (payload.type === "hit") {
+          message = `⚡ ${payload.duo} - ${payload.player} a perdu une vie (reste ${payload.lives})`;
+        } else if (payload.type === "eliminated") {
+          message = `💀 ${payload.duo} - ${payload.player} est éliminé !`;
+        } else if (payload.type === "heal") {
+          message = `💚 ${payload.duo} - ${payload.player} a été soigné (vies: ${payload.lives})`;
+        } else if (payload.type === "reset") {
+          message = `🔄 ${payload.message}`;
+        }
+
+        if (message) {
+          const div = document.createElement("div");
+          div.className = "notif";
+          div.textContent = message;
+          document.getElementById("notifications").prepend(div);
+          loadPlayers();
+        }
+      });
+    }
+
+    (async () => {
+      applyTheme(duoId);
+      document.getElementById("duoName").innerText = `Équipe ${duoId}`;
+      await loadPlayers();
+      initSocket();
+    })();
+  </script>
+</body>
+</html>
