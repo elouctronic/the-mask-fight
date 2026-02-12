@@ -6,17 +6,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style id="base-style">
+/* ------------------------------ */
+/* VARIABLES GLOBALES */
+/* ------------------------------ */
 :root{
-  --glass-bg: rgba(255,255,255,0.10);
-  --glass-border: rgba(255,255,255,0.25);
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.22);
   --glass-inner: rgba(255,255,255,0.35);
   --shadow-soft: 0 12px 40px rgba(0,0,0,0.35);
-  --radius: 22px;
-  --blur: 28px;
+  --radius: 24px;
+  --blur: 30px;
   --text-light: #f5f5f5;
+  --transition: 0.35s cubic-bezier(.25,.1,.25,1);
 }
 
+/* ------------------------------ */
 /* GLOBAL */
+/* ------------------------------ */
 body{
   font-family:'Segoe UI',system-ui,sans-serif;
   margin:0;
@@ -24,22 +30,24 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  background:#0b0b0b;
+  background:#0a0a0a;
   color:var(--text-light);
-  padding:20px;
+  padding:40px 20px;
   box-sizing:border-box;
   overflow-x:hidden;
 }
 
+/* ------------------------------ */
 /* BACKGROUND LIQUID */
+/* ------------------------------ */
 #animated-bg{
   position:fixed;
   inset:0;
   z-index:-2;
-  background-size:300% 300%;
-  animation:liquid 28s ease-in-out infinite;
-  filter:blur(80px) saturate(1.4);
-  opacity:0.75;
+  background-size:260% 260%;
+  animation:liquid 32s ease-in-out infinite;
+  filter:blur(90px) saturate(1.3);
+  opacity:0.65;
 }
 
 @keyframes liquid{
@@ -48,80 +56,121 @@ body{
   100%{background-position:0% 40%;}
 }
 
-/* TITRE */
+/* ------------------------------ */
+/* TITRES */
+/* ------------------------------ */
 h1{
-  font-size:2.3rem;
-  margin-bottom:25px;
-  letter-spacing:1px;
+  font-size:2.4rem;
+  margin-bottom:30px;
   text-align:center;
   font-weight:600;
-  backdrop-filter:blur(18px);
-  padding:14px 30px;
+  backdrop-filter:blur(20px);
+  padding:16px 32px;
   border-radius:var(--radius);
-  background:rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.05);
   border:1px solid var(--glass-border);
   box-shadow:var(--shadow-soft);
   animation:fadeIn 0.8s ease;
 }
 
 h2{
-  margin-top:35px;
-  margin-bottom:12px;
-  opacity:0.85;
+  margin-top:40px;
+  margin-bottom:14px;
+  opacity:0.9;
   font-weight:500;
-  letter-spacing:0.5px;
+  text-align:center;
 }
 
+/* ------------------------------ */
+/* CONTAINERS CENTRÉS */
+/* ------------------------------ */
+#myTeam, #otherTeams, #notifications{
+  width:100%;
+  max-width:700px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* ------------------------------ */
 /* PLAYER CARD */
+/* ------------------------------ */
 .player{
+  width:100%;
   backdrop-filter:blur(var(--blur)) saturate(1.4);
   background:var(--glass-bg);
   border:1px solid var(--glass-border);
-  padding:26px;
-  margin:16px 0;
+  padding:28px;
+  margin:18px 0;
   border-radius:var(--radius);
-  width:100%;
-  max-width:680px;
   box-shadow:var(--shadow-soft);
-  transition:0.35s ease;
+  transition:var(--transition);
   position:relative;
   overflow:hidden;
+  animation:cardEnter 0.6s ease forwards;
+  transform:translateY(20px);
+  opacity:0;
 }
 
-/* Inner glow (real glass effect) */
+/* Entrée douce */
+@keyframes cardEnter{
+  to{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
+/* Inner glow */
 .player::before{
   content:"";
   position:absolute;
   inset:0;
-  background:radial-gradient(
-    circle at top left,
+  background:radial-gradient(circle at top left,
     var(--glass-inner) 0%,
-    transparent 60%
-  );
+    transparent 60%);
   opacity:0.18;
   pointer-events:none;
 }
 
-/* Soft hover */
+/* Hover */
 .player:hover{
   transform:translateY(-6px);
-  background:rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.12);
 }
 
-/* BUTTONS */
+/* ------------------------------ */
+/* BOUTONS */
+/* ------------------------------ */
+.player-actions{
+  display:flex;
+  gap:12px;
+  margin-top:16px;
+}
+
 button{
-  padding:12px 18px;
+  padding:12px 20px;
   font-size:15px;
   cursor:pointer;
   border:none;
-  border-radius:12px;
+  border-radius:14px;
   color:#fff;
   font-weight:600;
   transition:0.25s ease;
   background:rgba(255,255,255,0.16);
-  backdrop-filter:blur(12px);
+  backdrop-filter:blur(14px);
   border:1px solid rgba(255,255,255,0.28);
   box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  animation:buttonPop 0.5s cubic-bezier(.34,1.56,.64,1) forwards;
+  opacity:0;
+  transform:scale(0.7);
+}
+
+/* Boutons qui pop avec rebond */
+@keyframes buttonPop{
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
 }
 
 button:hover{
@@ -129,25 +178,31 @@ button:hover{
   background:rgba(255,255,255,0.22);
 }
 
+/* ------------------------------ */
 /* NOTIFICATIONS */
+/* ------------------------------ */
 .notif{
-  padding:16px;
+  width:100%;
+  padding:18px;
   margin:12px 0;
   border-radius:var(--radius);
   font-weight:500;
-  backdrop-filter:blur(20px) saturate(1.4);
-  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(22px) saturate(1.4);
+  background:rgba(255,255,255,0.10);
   border:1px solid var(--glass-border);
   animation:fadeIn 0.5s ease;
   box-shadow:var(--shadow-soft);
 }
 
+/* Fade */
 @keyframes fadeIn{
   from{opacity:0; transform:translateY(-8px);}
   to{opacity:1; transform:translateY(0);}
 }
 
-/* FLASH HIT */
+/* ------------------------------ */
+/* FLASH EFFECTS */
+/* ------------------------------ */
 .flash-hit{
   animation:flashRed 0.45s ease;
 }
@@ -156,7 +211,6 @@ button:hover{
   100%{background:transparent;}
 }
 
-/* FLASH HEAL */
 .flash-heal{
   animation:flashGreen 0.45s ease;
 }
@@ -351,3 +405,4 @@ function initSocket(){
 
 </body>
 </html>
+
