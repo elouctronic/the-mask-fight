@@ -10,20 +10,27 @@
 /* VARIABLES */
 /* ------------------------------ */
 :root{
-  --bg: #0d0d0f;
-  --card: #16161a;
-  --card-hover: #1c1c21;
-  --border: #2a2a2f;
+  --bg1: #0d0d12;
+  --bg2: #14141c;
+  --bg3: #1a1a24;
+
+  --card: #18181f;
+  --card-hover: #1f1f28;
+  --border: #2a2a33;
+
   --text: #f5f5f7;
+  --text-soft: #c7c7d0;
+
   --accent: #4d7cff;
   --accent-soft: rgba(77,124,255,0.15);
+
   --radius: 14px;
   --shadow: 0 8px 24px rgba(0,0,0,0.35);
   --transition: 0.25s cubic-bezier(.25,.1,.25,1);
 }
 
 /* ------------------------------ */
-/* GLOBAL */
+/* BACKGROUND GRADIENT PREMIUM */
 /* ------------------------------ */
 body{
   font-family:'Inter',system-ui,sans-serif;
@@ -32,10 +39,21 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  background:var(--bg);
+  background:
+    radial-gradient(circle at 20% 20%, #1f1f2d 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, #24243a 0%, transparent 60%),
+    linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+  background-size: 200% 200%;
+  animation:bgMove 18s ease-in-out infinite;
   color:var(--text);
   padding:40px 20px;
   box-sizing:border-box;
+}
+
+@keyframes bgMove{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
 /* ------------------------------ */
@@ -46,6 +64,7 @@ h1{
   margin-bottom:30px;
   font-weight:700;
   text-align:center;
+  animation:fadeIn 0.6s ease;
 }
 
 h2{
@@ -79,9 +98,9 @@ h2{
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   transition:var(--transition);
-  transform:translateY(10px);
+  transform:translateY(12px);
   opacity:0;
-  animation:cardEnter 0.4s ease forwards;
+  animation:cardEnter 0.45s ease forwards;
 }
 
 @keyframes cardEnter{
@@ -230,11 +249,11 @@ if(!duoId){
 }
 
 const themes={
-Bolchevik:{gradient:"",button:"#ff4d4d"},
-JELP:{gradient:"",button:"#4da3ff"},
-SpawnKill:{gradient:"",button:"#e0e0e0"},
-"11br":{gradient:"",button:"#ffea55"},
-Yanjacis:{gradient:"",button:"#33ff99"}
+Bolchevik:{button:"#ff4d4d"},
+JELP:{button:"#4da3ff"},
+SpawnKill:{button:"#e0e0e0"},
+"11br":{button:"#ffea55"},
+Yanjacis:{button:"#33ff99"}
 };
 
 function applyTheme(team){
