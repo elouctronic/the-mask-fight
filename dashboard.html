@@ -46,6 +46,27 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.6);
       width: 100%;
       box-sizing: border-box;
+      transition: 0.3s;
+    }
+
+    /* Animation perte de vie */
+    .life-loss {
+      animation: hitFlash 0.6s ease-out;
+    }
+
+    @keyframes hitFlash {
+      0% { background-color: rgba(255,0,0,0.6); transform: scale(1.05); }
+      100% { background-color: rgba(20,20,20,0.8); transform: scale(1); }
+    }
+
+    /* Animation gain de vie */
+    .life-gain {
+      animation: healFlash 0.6s ease-out;
+    }
+
+    @keyframes healFlash {
+      0% { background-color: rgba(0,255,0,0.4); transform: scale(1.05); }
+      100% { background-color: rgba(20,20,20,0.8); transform: scale(1); }
     }
     
     button {
@@ -167,10 +188,11 @@
         darkText: false
       },
 
+      /* 🔥 SpawnKill amélioré */
       SpawnKill: { 
-        background: "linear-gradient(135deg, #ffffff, #cccccc)", 
-        button: "linear-gradient(135deg, #eeeeee, #bbbbbb)", 
-        notif: "#ffffff",
+        background: "linear-gradient(135deg, #d9e4ff, #8fa4d4)", 
+        button: "linear-gradient(135deg, #b8c8f0, #6f82b8)", 
+        notif: "#dbe3ff",
         darkText: true
       },
 
@@ -203,6 +225,9 @@
       `;
     }
 
+    /* Mémoire des vies pour animations */
+    let previousLives = {};
+
     async function loadPlayers() {
       const res = await fetch(`${BACKEND_URL}/api/players`);
       const players = await res.json();
@@ -223,6 +248,19 @@
         k => k.toLowerCase() === duoId.toLowerCase()
       );
 
+      function applyLifeAnimation(container, player) {
+        const old = previousLives[player.id];
+        if (old !== undefined && old !== player.lives) {
+          if (player.lives < old) {
+            container.classList.add("life-loss");
+          } else {
+            container.classList.add("life-gain");
+          }
+          setTimeout(() => container.classList.remove("life-loss", "life-gain"), 700);
+        }
+        previousLives[player.id] = player.lives;
+      }
+
       if (myTeamKey) {
         grouped[myTeamKey].forEach(p => {
           const container = document.createElement("div");
@@ -237,6 +275,7 @@
               </div>
             ` : "<p>Éliminé 💀</p>"}
           `;
+          applyLifeAnimation(container, p);
           myDiv.appendChild(container);
         });
         delete grouped[myTeamKey];
@@ -252,6 +291,7 @@
             <strong>${p.name}</strong> — Vies restantes: ${p.lives}
             ${p.lives === 0 ? " 💀" : ""}
           `;
+          applyLifeAnimation(container, p);
           teamDiv.appendChild(container);
         });
         otherDiv.appendChild(teamDiv);
