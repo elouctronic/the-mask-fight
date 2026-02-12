@@ -1,322 +1,231 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<title>Battle Royale IRL</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Battle Royale IRL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style id="base-style">
-:root{
-  --glass: rgba(255,255,255,0.06);
-  --border: rgba(255,255,255,0.15);
-  --shadow: 0 10px 30px rgba(0,0,0,0.6);
-}
+  <!-- Style de base -->
+  <style id="base-style">
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #000;
+      color: #eee;
+      padding: 0 10px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-body{
-  font-family:'Segoe UI',system-ui,sans-serif;
-  margin:0;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  background:#000;
-  color:#f5f5f5;
-  padding:20px;
-  box-sizing:border-box;
-  overflow-x:hidden;
-}
+    /* Calque d’animation */
+    #animated-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.45;
+      background: transparent;
+    }
 
-/* Background animé */
-#animated-bg{
-  position:fixed;
-  inset:0;
-  z-index:-2;
-  background-size:400% 400%;
-  animation:gradientMove 15s ease infinite;
-}
+    h1 { text-align: center; margin: 15px 0; font-size: 1.8rem; font-weight: 700; }
+    h2 { margin-top: 20px; margin-bottom: 10px; font-size: 1.4rem; }
+    h3 { margin-top: 20px; margin-bottom: 10px; font-size: 1.2rem; }
 
-@keyframes gradientMove{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
+    .player {
+      border: 1px solid #444;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 10px;
+      background: rgba(20,20,20,0.85);
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      width: 100%;
+      box-sizing: border-box;
+      backdrop-filter: blur(4px);
+    }
 
-h1{
-  font-size:2rem;
-  margin-bottom:25px;
-  letter-spacing:1px;
-  text-align:center;
-}
+    /* Boutons stylés */
+    button {
+      margin-top: 8px;
+      padding: 12px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 8px;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      transition: 0.25s ease;
+      min-height: 44px;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+    }
 
-h2{
-  margin-top:30px;
-  margin-bottom:10px;
-  opacity:0.8;
-  font-weight:500;
-}
+    /* Effet ripple */
+    button::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.4);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      top: var(--y);
+      left: var(--x);
+      opacity: 0;
+      transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease;
+    }
 
-.player{
-  backdrop-filter:blur(14px);
-  background:var(--glass);
-  border:1px solid var(--border);
-  padding:16px;
-  margin:10px 0;
-  border-radius:14px;
-  width:100%;
-  max-width:600px;
-  box-shadow:var(--shadow);
-  transition:0.3s ease;
-}
+    button:active::after {
+      width: 200px;
+      height: 200px;
+      opacity: 1;
+    }
 
-.player:hover{
-  transform:translateY(-4px);
-}
+    /* Hover 3D */
+    button:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
 
-.player-actions{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-}
+    #notifications { margin-top: 20px; width: 100%; max-width: 600px; }
+    .notif { padding: 10px; margin: 5px 0; border-radius: 5px; font-weight: bold; text-align: center; }
 
-button{
-  padding:10px 14px;
-  font-size:14px;
-  cursor:pointer;
-  border:none;
-  border-radius:8px;
-  color:#fff;
-  font-weight:600;
-  transition:0.25s ease;
-}
+    .player-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
 
-button:hover{
-  transform:scale(1.05);
-}
+    .player-actions button { flex: 1; min-width: 120px; }
+  </style>
 
-.notif{
-  padding:10px;
-  margin:8px 0;
-  border-radius:10px;
-  font-weight:600;
-  backdrop-filter:blur(10px);
-  background:rgba(0,0,0,0.5);
-  border:1px solid var(--border);
-  animation:fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(-10px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
-#notifications{
-  width:100%;
-  max-width:600px;
-  margin-top:20px;
-}
-
-/* Flash hit */
-.flash-hit{
-  animation:flashRed 0.4s;
-}
-@keyframes flashRed{
-  0%{background:rgba(255,0,0,0.3);}
-  100%{background:transparent;}
-}
-
-/* Flash heal */
-.flash-heal{
-  animation:flashGreen 0.4s;
-}
-@keyframes flashGreen{
-  0%{background:rgba(0,255,0,0.3);}
-  100%{background:transparent;}
-}
-
-</style>
-
-<style id="dynamic-style"></style>
+  <!-- Style dynamique -->
+  <style id="dynamic-style"></style>
 </head>
 
 <body>
+  <div id="animated-bg"></div>
 
-<div id="animated-bg"></div>
+  <h1 id="duoName"></h1>
 
-<h1 id="duoName"></h1>
+  <h2>Mon binôme</h2>
+  <div id="myTeam"></div>
 
-<h2>Mon binôme</h2>
-<div id="myTeam"></div>
+  <h2>Autres équipes</h2>
+  <div id="otherTeams"></div>
 
-<h2>Autres équipes</h2>
-<div id="otherTeams"></div>
+  <h3>Notifications</h3>
+  <div id="notifications"></div>
 
-<h2>Notifications</h2>
-<div id="notifications"></div>
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <script>
+    const BACKEND_URL = "https://the-mask-fight.onrender.com";
+    const duoId = (localStorage.getItem("duoId") || "").trim();
+    let socket;
 
-<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
-
-<script>
-const BACKEND_URL="https://the-mask-fight.onrender.com";
-const duoId=(localStorage.getItem("duoId")||"").trim();
-let socket;
-
-if(!duoId){
-  alert("Aucun binôme détecté.");
-  window.location.href="index.html";
-}
-
-/* THEMES */
-const themes={
-Bolchevik:{
-  gradient:"linear-gradient(-45deg,#3a0000,#7a0000,#1a0000,#550000)",
-  button:"#ff1a1a",
-  glow:"0 0 20px rgba(255,0,0,0.7)"
-},
-JELP:{
-  gradient:"linear-gradient(-45deg,#001f4d,#0044cc,#000d33,#0066ff)",
-  button:"#3399ff",
-  glow:"0 0 20px rgba(0,100,255,0.7)"
-},
-SpawnKill:{
-  gradient:"linear-gradient(-45deg,#111,#444,#000,#666)",
-  button:"#ffffff",
-  glow:"0 0 20px rgba(255,255,255,0.6)"
-},
-"11br":{
-  gradient:"linear-gradient(-45deg,#332b00,#665500,#1a1400,#ffcc00)",
-  button:"#ffdd00",
-  glow:"0 0 20px rgba(255,230,0,0.7)"
-},
-Yanjacis:{
-  gradient:"linear-gradient(-45deg,#002b00,#006600,#001a00,#00cc44)",
-  button:"#00ff66",
-  glow:"0 0 20px rgba(0,255,100,0.7)"
-}
-};
-
-function applyTheme(team){
-  const theme=themes[team];
-  if(!theme)return;
-
-  document.getElementById("dynamic-style").innerHTML=`
-    #animated-bg{background:${theme.gradient};}
-    button{background:${theme.button}; box-shadow:${theme.glow};}
-    h1{text-shadow:${theme.glow};}
-  `;
-}
-
-async function loadPlayers(){
-  const res=await fetch(`${BACKEND_URL}/api/players`);
-  const players=await res.json();
-
-  const myDiv=document.getElementById("myTeam");
-  const otherDiv=document.getElementById("otherTeams");
-  myDiv.innerHTML="";
-  otherDiv.innerHTML="";
-
-  const grouped={};
-  players.forEach(p=>{
-    const key=(p.duo||"").trim();
-    if(!grouped[key])grouped[key]=[];
-    grouped[key].push(p);
-  });
-
-  const myTeamKey=Object.keys(grouped).find(
-    k=>k.toLowerCase()===duoId.toLowerCase()
-  );
-
-  if(myTeamKey){
-    grouped[myTeamKey].forEach(p=>{
-      const container=document.createElement("div");
-      container.className="player";
-      container.innerHTML=`
-        <h3>${p.name}</h3>
-        <p>Vies restantes : ${p.lives}</p>
-        ${p.lives>0?`
-          <div class="player-actions">
-            <button onclick="hit('${p.id}')">Touché</button>
-            <button onclick="heal('${p.id}')">Heal</button>
-          </div>
-        `:"<p>Éliminé 💀</p>"}
-      `;
-      myDiv.appendChild(container);
-    });
-    delete grouped[myTeamKey];
-  }
-
-  Object.keys(grouped).forEach(team=>{
-    const teamDiv=document.createElement("div");
-    teamDiv.innerHTML=`<h3>${team}</h3>`;
-    grouped[team].forEach(p=>{
-      const container=document.createElement("div");
-      container.className="player";
-      container.innerHTML=`
-        <strong>${p.name}</strong> — ${p.lives} vies
-        ${p.lives===0?" 💀":""}
-      `;
-      teamDiv.appendChild(container);
-    });
-    otherDiv.appendChild(teamDiv);
-  });
-}
-
-async function hit(playerId){
-  document.body.classList.add("flash-hit");
-  setTimeout(()=>document.body.classList.remove("flash-hit"),400);
-
-  await fetch(`${BACKEND_URL}/api/touche`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({playerId,duoId})
-  });
-  loadPlayers();
-}
-
-async function heal(playerId){
-  document.body.classList.add("flash-heal");
-  setTimeout(()=>document.body.classList.remove("flash-heal"),400);
-
-  await fetch(`${BACKEND_URL}/api/heal`,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({playerId,duoId})
-  });
-  loadPlayers();
-}
-
-function initSocket(){
-  socket=io(BACKEND_URL,{transports:["websocket"]});
-
-  socket.on("notif",(payload)=>{
-    let message="";
-
-    if(payload.type==="hit"){
-      message=`⚡ ${payload.duo} - ${payload.player} a perdu une vie (${payload.lives})`;
-    }else if(payload.type==="eliminated"){
-      message=`💀 ${payload.duo} - ${payload.player} est éliminé !`;
-    }else if(payload.type==="heal"){
-      message=`💚 ${payload.duo} - ${payload.player} soigné (${payload.lives})`;
-    }else if(payload.type==="reset"){
-      message=`🔄 ${payload.message}`;
+    if (!duoId) {
+      alert("Aucun binôme détecté, retour au login.");
+      window.location.href = "index.html";
     }
 
-    if(message){
-      const div=document.createElement("div");
-      div.className="notif";
-      div.textContent=message;
-      document.getElementById("notifications").prepend(div);
-      loadPlayers();
-    }
-  });
-}
+    /* 🎨 Thèmes + animations stylées */
+    const themes = {
+      Bolchevik: {
+        background: "linear-gradient(135deg, #4a0000, #000000)",
+        button: "#ff3333",
+        notif: "#ff4444",
+        text: "#fff",
+        animation: `
+          #animated-bg {
+            background: radial-gradient(circle, rgba(255,0,0,0.25), transparent);
+            animation: smoke 6s infinite alternate ease-in-out;
+          }
+          @keyframes smoke {
+            0% { transform: translate(-40px, -40px) scale(1); }
+            100% { transform: translate(40px, 40px) scale(1.5); }
+          }
+        `
+      },
 
-(async()=>{
-  applyTheme(duoId);
-  document.getElementById("duoName").innerText=`Équipe ${duoId}`;
-  await loadPlayers();
-  initSocket();
-})();
-</script>
+      JELP: {
+        background: "linear-gradient(135deg, #001a66, #000000)",
+        button: "#0066ff",
+        notif: "#3399ff",
+        text: "#fff",
+        animation: `
+          #animated-bg {
+            background: linear-gradient(120deg, rgba(0,120,255,0.35), transparent);
+            background-size: 200% 200%;
+            animation: waves 5s infinite ease-in-out;
+          }
+          @keyframes waves {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+          }
+        `
+      },
 
-</body>
-</html>
+      SpawnKill: {
+        background: "linear-gradient(135deg, #3a3a3a, #000000)",
+        button: "#ffffff",
+        notif: "#ffffff",
+        text: "#000",
+        animation: `
+          #animated-bg {
+            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(0,0,0,0.12));
+            background-size: 300% 300%;
+            animation: glasswave 7s infinite ease-in-out;
+          }
+          @keyframes glasswave {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `
+      },
+
+      "11br": {
+        background: "linear-gradient(135deg, #665500, #000000)",
+        button: "#ffdd00",
+        notif: "#ffea00",
+        text: "#000",
+        animation: `
+          #animated-bg {
+            background: radial-gradient(circle, rgba(255,230,0,0.3), transparent);
+            animation: pulse 2s infinite ease-in-out;
+          }
+          @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.4); opacity: 0.5; }
+          }
+        `
+      },
+
+      Yanjacis: {
+        background: "linear-gradient(135deg, #003300, #000000)",
+        button: "#00cc00",
+        notif: "#00ff00",
+        text: "#fff",
+        animation: `
+          #animated-bg {
+            background: radial-gradient(circle, rgba(0,255,0,0.25), transparent);
+            animation: particles 3s infinite ease-in-out;
+          }
+          @keyframes particles {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-40px); }
+          }
+        `
+      }
+    };
+
+    function applyTheme(team) {
+      const theme =
