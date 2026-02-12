@@ -17,7 +17,6 @@ app.use(express.json());
 // ----------------------
 app.use(express.static(path.join(__dirname)));
 
-// Routes pour accéder directement aux pages
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
@@ -41,9 +40,10 @@ pool.connect()
   .catch(err => console.error("Erreur connexion PostgreSQL", err));
 
 // ----------------------
-// Initialisation DB
+// Initialisation DB (RESET + RESEED AUTOMATIQUE)
 // ----------------------
 async function initDB() {
+  // Création des tables si elles n'existent pas
   await pool.query(`
     CREATE TABLE IF NOT EXISTS players (
       id TEXT PRIMARY KEY,
@@ -60,36 +60,44 @@ async function initDB() {
     )
   `);
 
+  // 🔥 RESET AUTOMATIQUE DES DONNÉES
+  await pool.query("DELETE FROM players");
+  await pool.query("DELETE FROM duos");
+
   // ⚡️ uniquement les vraies équipes
   const joueurs = [
-    ["violette_p1", "Violette", "Elouan", 3],
-    ["violette_p2", "Violette", "Maxence M.", 3],
-    ["bleue_p1", "Bleue", "Yannis", 3],
-    ["bleue_p2", "Bleue", "Jacques", 3],
+    ["violette_p1", "JELP", "Elouan", 3],
+    ["violette_p2", "JELP", "Maxence M.", 3],
+    ["bleue_p1", "Yanjacis", "Yannis", 3],
+    ["bleue_p2", "Yanjacis", "Jacques", 3],
     ["rouge_p1", "Bolchevik", "Paul", 3],
     ["rouge_p2", "Bolchevik", "Emile", 3],
-    ["orange_p1", "Orange", "Arthur", 3],
-    ["orange_p2", "Orange", "Gabin", 3],
-    ["verte_p1", "Verte", "Lucka", 3],
-    ["verte_p2", "Verte", "Maxence B.", 3],
+    ["orange_p1", "SpawnKill", "Arthur", 3],
+    ["orange_p2", "SpawnKill", "Gabin", 3],
+    ["verte_p1", "11br", "Lucka", 3],
+    ["verte_p2", "11br", "Maxence B.", 3],
   ];
 
-  const duos = ["Violette", "Bleue", "Bolchevik", "Orange", "Verte"];
+  const duos = ["JELP", "Yanjacis", "Bolchevik", "SpawnKill", "11br"];
 
+  // Réinsertion propre
   for (const j of joueurs) {
     await pool.query(
-      "INSERT INTO players (id, duo, name, lives) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO NOTHING",
+      "INSERT INTO players (id, duo, name, lives) VALUES ($1, $2, $3, $4)",
       j
     );
   }
 
   for (const d of duos) {
     await pool.query(
-      "INSERT INTO duos (name) VALUES ($1) ON CONFLICT (name) DO NOTHING",
+      "INSERT INTO duos (name, heal_used) VALUES ($1, FALSE)",
       [d]
     );
   }
+
+  console.log("🔄 Base de données resynchronisée avec server.js");
 }
+
 initDB();
 
 // ----------------------
@@ -185,7 +193,7 @@ app.post("/api/heal", async (req, res) => {
   return res.json({ success: true, playerId, lives: newLives });
 });
 
-// Reset
+// Reset manuel
 app.post("/api/reset", async (req, res) => {
   try {
     await pool.query("UPDATE players SET lives = 3");
@@ -214,4 +222,6 @@ io.on("connection", (socket) => {
 // Lancement du serveur
 // ----------------------
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`));
+server.listen(PORT, () =>
+  console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`)
+);
