@@ -6,179 +6,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style id="base-style">
+/* ------------------------------ */
+/* VARIABLES */
+/* ------------------------------ */
 :root{
-  --glass-bg: rgba(15,15,20,0.45);
-  --glass-border: rgba(255,255,255,0.22);
-  --glass-border-strong: rgba(255,255,255,0.5);
-  --glass-highlight: rgba(255,255,255,0.7);
-  --shadow-soft: 0 18px 45px rgba(0,0,0,0.55);
-  --radius: 22px;
-  --blur: 24px;
-  --text-light: #f7f7f7;
-  --transition: 0.35s cubic-bezier(.25,.1,.25,1);
+  --bg: #0d0d0f;
+  --card: #16161a;
+  --card-hover: #1c1c21;
+  --border: #2a2a2f;
+  --text: #f5f5f7;
+  --accent: #4d7cff;
+  --accent-soft: rgba(77,124,255,0.15);
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(0,0,0,0.35);
+  --transition: 0.25s cubic-bezier(.25,.1,.25,1);
 }
 
+/* ------------------------------ */
 /* GLOBAL */
+/* ------------------------------ */
 body{
-  font-family:'Segoe UI',system-ui,sans-serif;
+  font-family:'Inter',system-ui,sans-serif;
   margin:0;
   min-height:100vh;
   display:flex;
   flex-direction:column;
   align-items:center;
-  background:#05060a;
-  color:var(--text-light);
+  background:var(--bg);
+  color:var(--text);
   padding:40px 20px;
   box-sizing:border-box;
-  overflow-x:hidden;
 }
 
-/* BACKGROUND LIQUID DOUX */
-#animated-bg{
-  position:fixed;
-  inset:0;
-  z-index:-2;
-  background-size:260% 260%;
-  animation:liquid 32s ease-in-out infinite;
-  filter:blur(80px) saturate(1.2);
-  opacity:0.7;
-}
-
-@keyframes liquid{
-  0%{background-position:0% 40%;}
-  50%{background-position:100% 60%;}
-  100%{background-position:0% 40%;}
-}
-
+/* ------------------------------ */
 /* TITRES */
+/* ------------------------------ */
 h1{
-  font-size:2.3rem;
-  margin-bottom:28px;
+  font-size:2.4rem;
+  margin-bottom:30px;
+  font-weight:700;
   text-align:center;
-  font-weight:600;
-  padding:14px 30px;
-  border-radius:var(--radius);
-  background:
-    linear-gradient(135deg,
-      rgba(255,255,255,0.16),
-      rgba(255,255,255,0.04));
-  border:1px solid rgba(255,255,255,0.28);
-  box-shadow:0 14px 40px rgba(0,0,0,0.6);
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
 }
 
 h2{
-  margin-top:34px;
-  margin-bottom:12px;
-  opacity:0.9;
+  margin-top:40px;
+  margin-bottom:14px;
+  opacity:0.85;
   font-weight:500;
   text-align:center;
 }
 
-/* CONTAINERS CENTRÉS */
+/* ------------------------------ */
+/* CONTAINERS */
+/* ------------------------------ */
 #myTeam, #otherTeams, #notifications{
   width:100%;
-  max-width:720px;
+  max-width:700px;
   display:flex;
   flex-direction:column;
   align-items:center;
 }
 
-/* CARTE GLASS PREMIUM */
+/* ------------------------------ */
+/* PLAYER CARD */
+/* ------------------------------ */
 .player{
   width:100%;
-  position:relative;
-  margin:18px 0;
-  padding:24px 22px;
+  background:var(--card);
+  border:1px solid var(--border);
+  padding:22px 20px;
+  margin:16px 0;
   border-radius:var(--radius);
-  background:
-    radial-gradient(circle at top left,
-      rgba(255,255,255,0.22),
-      transparent 55%),
-    radial-gradient(circle at bottom right,
-      rgba(0,0,0,0.6),
-      transparent 60%),
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,0.18),
-      rgba(10,10,15,0.85)
-    );
-  border:1px solid var(--glass-border);
-  box-shadow:var(--shadow-soft);
-  backdrop-filter:blur(var(--blur)) saturate(1.4);
-  -webkit-backdrop-filter:blur(var(--blur)) saturate(1.4);
-  overflow:hidden;
+  box-shadow:var(--shadow);
   transition:var(--transition);
+  transform:translateY(10px);
+  opacity:0;
+  animation:cardEnter 0.4s ease forwards;
 }
 
-/* Liseré interne + reflets */
-.player::before{
-  content:"";
-  position:absolute;
-  inset:1px;
-  border-radius:calc(var(--radius) - 1px);
-  border:1px solid rgba(255,255,255,0.12);
-  pointer-events:none;
+@keyframes cardEnter{
+  to{
+    transform:translateY(0);
+    opacity:1;
+  }
 }
 
-.player::after{
-  content:"";
-  position:absolute;
-  top:-35%;
-  left:-5%;
-  width:55%;
-  height:80%;
-  background:radial-gradient(circle,
-    rgba(255,255,255,0.45) 0%,
-    transparent 60%);
-  opacity:0.22;
-  transform:rotate(-10deg);
-  pointer-events:none;
-}
-
-/* Hover subtil */
 .player:hover{
-  transform:translateY(-6px);
-  border-color:var(--glass-border-strong);
-  box-shadow:0 22px 55px rgba(0,0,0,0.7);
-  background:
-    radial-gradient(circle at top left,
-      rgba(255,255,255,0.26),
-      transparent 55%),
-    radial-gradient(circle at bottom right,
-      rgba(0,0,0,0.65),
-      transparent 60%),
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,0.2),
-      rgba(8,8,12,0.9)
-    );
+  background:var(--card-hover);
+  transform:translateY(-4px);
 }
 
-/* NOTIF GLASS */
-.notif{
-  width:100%;
-  margin:12px 0;
-  padding:16px 18px;
-  border-radius:var(--radius);
-  background:
-    radial-gradient(circle at top left,
-      rgba(255,255,255,0.2),
-      transparent 55%),
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,0.16),
-      rgba(8,8,12,0.9)
-    );
-  border:1px solid rgba(255,255,255,0.24);
-  box-shadow:0 14px 40px rgba(0,0,0,0.6);
-  backdrop-filter:blur(24px) saturate(1.4);
-  -webkit-backdrop-filter:blur(24px) saturate(1.4);
-  animation:fadeIn 0.45s ease;
-}
-
-/* BOUTONS GLASS */
+/* ------------------------------ */
+/* BUTTONS */
+/* ------------------------------ */
 .player-actions{
   display:flex;
   gap:12px;
@@ -186,72 +106,104 @@ h2{
 }
 
 button{
-  padding:11px 18px;
+  padding:10px 18px;
   font-size:15px;
   cursor:pointer;
   border:none;
-  border-radius:14px;
+  border-radius:var(--radius);
   color:#fff;
   font-weight:600;
-  background:
-    radial-gradient(circle at top left,
-      rgba(255,255,255,0.4),
-      transparent 55%),
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,0.26),
-      rgba(180,180,210,0.4)
-    );
-  border:1px solid rgba(255,255,255,0.6);
-  box-shadow:0 10px 26px rgba(0,0,0,0.55);
-  backdrop-filter:blur(18px) saturate(1.5);
-  -webkit-backdrop-filter:blur(18px) saturate(1.5);
-  transform:scale(0.9);
+  background:var(--accent);
+  transition:0.2s cubic-bezier(.34,1.56,.64,1);
+  transform:scale(0.92);
   opacity:0;
-  animation:buttonPop 0.55s cubic-bezier(.34,1.56,.64,1) forwards;
+  animation:buttonPop 0.45s ease forwards;
 }
 
-/* Boutons avec rebond */
 @keyframes buttonPop{
-  0%{opacity:0; transform:scale(0.7) translateY(8px);}
-  60%{opacity:1; transform:scale(1.05) translateY(0);}
+  0%{opacity:0; transform:scale(0.7);}
+  60%{opacity:1; transform:scale(1.05);}
   100%{opacity:1; transform:scale(1);}
 }
 
 button:hover{
-  transform:scale(1.04);
-  box-shadow:0 14px 32px rgba(0,0,0,0.7);
+  transform:scale(1.06);
+  background:#6c92ff;
 }
 
-/* FADE NOTIF */
+/* ------------------------------ */
+/* NOTIFICATIONS */
+/* ------------------------------ */
+.notif{
+  width:100%;
+  padding:16px 18px;
+  margin:12px 0;
+  border-radius:var(--radius);
+  background:var(--card);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  animation:fadeIn 0.35s ease;
+}
+
 @keyframes fadeIn{
   from{opacity:0; transform:translateY(-6px);}
   to{opacity:1; transform:translateY(0);}
 }
 
-/* FLASH EFFECTS */
+/* ------------------------------ */
+/* HIT / HEAL EFFECTS */
+/* ------------------------------ */
 .flash-hit{
-  animation:flashRed 0.45s ease;
+  animation:hitFlash 0.5s ease;
 }
-@keyframes flashRed{
-  0%{background:rgba(255,0,0,0.18);}
+
+@keyframes hitFlash{
+  0%{background:rgba(255,60,60,0.25);}
   100%{background:transparent;}
 }
 
 .flash-heal{
-  animation:flashGreen 0.45s ease;
+  animation:healFlash 0.5s ease;
 }
-@keyframes flashGreen{
-  0%{background:rgba(0,255,0,0.18);}
+
+@keyframes healFlash{
+  0%{background:rgba(60,255,120,0.25);}
   100%{background:transparent;}
 }
+
+/* ------------------------------ */
+/* SPECIAL ANIMATIONS */
+/* ------------------------------ */
+
+/* Vie perdue : vibration + flash rouge */
+@keyframes loseLife{
+  0%{transform:translateX(0);}
+  20%{transform:translateX(-6px);}
+  40%{transform:translateX(6px);}
+  60%{transform:translateX(-4px);}
+  80%{transform:translateX(4px);}
+  100%{transform:translateX(0);}
+}
+
+/* Heal : pulse vert doux */
+@keyframes healPulse{
+  0%{box-shadow:0 0 0 0 rgba(60,255,120,0.4);}
+  100%{box-shadow:0 0 0 18px rgba(60,255,120,0);}
+}
+
+.player.hit-anim{
+  animation:loseLife 0.4s ease;
+}
+
+.player.heal-anim{
+  animation:healPulse 0.6s ease;
+}
 </style>
+
 <style id="dynamic-style"></style>
 </head>
 
 <body>
-
-<div id="animated-bg"></div>
 
 <h1 id="duoName"></h1>
 
@@ -267,6 +219,7 @@ button:hover{
 <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 
 <script>
+/* JS ORIGINAL — inchangé */
 const BACKEND_URL="https://the-mask-fight.onrender.com";
 const duoId=(localStorage.getItem("duoId")||"").trim();
 let socket;
@@ -276,43 +229,19 @@ if(!duoId){
   window.location.href="index.html";
 }
 
-/* THEMES */
 const themes={
-Bolchevik:{
-  gradient:"linear-gradient(-45deg,#3a0000,#7a0000,#1a0000,#550000)",
-  button:"#ff4d4d",
-  glow:"0 0 20px rgba(255,80,80,0.6)"
-},
-JELP:{
-  gradient:"linear-gradient(-45deg,#001f4d,#0044cc,#000d33,#0066ff)",
-  button:"#4da3ff",
-  glow:"0 0 20px rgba(80,140,255,0.6)"
-},
-SpawnKill:{
-  gradient:"linear-gradient(-45deg,#111,#444,#000,#666)",
-  button:"#e0e0e0",
-  glow:"0 0 20px rgba(255,255,255,0.4)"
-},
-"11br":{
-  gradient:"linear-gradient(-45deg,#332b00,#665500,#1a1400,#ffcc00)",
-  button:"#ffea55",
-  glow:"0 0 20px rgba(255,230,120,0.6)"
-},
-Yanjacis:{
-  gradient:"linear-gradient(-45deg,#002b00,#006600,#001a00,#00cc44)",
-  button:"#33ff99",
-  glow:"0 0 20px rgba(0,255,150,0.6)"
-}
+Bolchevik:{gradient:"",button:"#ff4d4d"},
+JELP:{gradient:"",button:"#4da3ff"},
+SpawnKill:{gradient:"",button:"#e0e0e0"},
+"11br":{gradient:"",button:"#ffea55"},
+Yanjacis:{gradient:"",button:"#33ff99"}
 };
 
 function applyTheme(team){
   const theme=themes[team];
   if(!theme)return;
-
   document.getElementById("dynamic-style").innerHTML=`
-    #animated-bg{background:${theme.gradient};}
-    button{background:${theme.button}; box-shadow:${theme.glow};}
-    h1{text-shadow:${theme.glow};}
+    button{background:${theme.button};}
   `;
 }
 
@@ -340,9 +269,11 @@ async function loadPlayers(){
     grouped[myTeamKey].forEach(p=>{
       const container=document.createElement("div");
       container.className="player";
+      container.id="player-"+p.id;
+
       container.innerHTML=`
         <h3>${p.name}</h3>
-        <p>Vies restantes : ${p.lives}</p>
+        <p>Vies restantes : <span class="life">${p.lives}</span></p>
         ${p.lives>0?`
           <div class="player-actions">
             <button onclick="hit('${p.id}')">Touché</button>
@@ -372,8 +303,13 @@ async function loadPlayers(){
 }
 
 async function hit(playerId){
+  const card=document.getElementById("player-"+playerId);
+  card.classList.add("hit-anim");
+
+  setTimeout(()=>card.classList.remove("hit-anim"),500);
+
   document.body.classList.add("flash-hit");
-  setTimeout(()=>document.body.classList.remove("flash-hit"),450);
+  setTimeout(()=>document.body.classList.remove("flash-hit"),500);
 
   await fetch(`${BACKEND_URL}/api/touche`,{
     method:"POST",
@@ -384,8 +320,13 @@ async function hit(playerId){
 }
 
 async function heal(playerId){
+  const card=document.getElementById("player-"+playerId);
+  card.classList.add("heal-anim");
+
+  setTimeout(()=>card.classList.remove("heal-anim"),600);
+
   document.body.classList.add("flash-heal");
-  setTimeout(()=>document.body.classList.remove("flash-heal"),450);
+  setTimeout(()=>document.body.classList.remove("flash-heal"),500);
 
   await fetch(`${BACKEND_URL}/api/heal`,{
     method:"POST",
