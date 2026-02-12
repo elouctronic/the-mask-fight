@@ -6,355 +6,343 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style id="dynamic-style">
+/* ===== BASE ===== */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(270deg, #000000, #111, #000);
+  background-size: 400% 400%;
+  animation: bgMove 15s ease infinite;
+  color: #eee;
+  padding: 0 10px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
 
-    /* ------------------------------
-       BASE UI (VALORANT STYLE)
-    ------------------------------ */
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #0a0a0f;
-      color: #e6e6e6;
-      padding: 0 10px;
-      box-sizing: border-box;
-      overflow-x: hidden;
-    }
+h1 {
+  margin: 20px 0;
+  font-size: 1.8rem;
+  animation: fadeDown 1s ease;
+}
 
-    h1, h2, h3 {
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+h2, h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
 
-    h1 { margin: 20px 0; font-size: 1.8rem; }
-    h2 { margin-top: 25px; font-size: 1.4rem; }
-    h3 { margin-top: 20px; font-size: 1.1rem; }
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    /* ------------------------------
-       PLAYER CARD
-    ------------------------------ */
+/* ===== PLAYER CARD ===== */
+.player {
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 12px;
+  background: rgba(20,20,20,0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+  width: 100%;
+  box-sizing: border-box;
+  transition: 0.4s ease;
+  animation: fadeUp 0.6s ease;
+}
 
-    .player {
-      border: 1px solid rgba(255,255,255,0.08);
-      padding: 14px;
-      margin: 10px 0;
-      border-radius: 10px;
-      background: rgba(20,20,30,0.85);
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      width: 100%;
-      box-sizing: border-box;
-      position: relative;
-      overflow: hidden;
-      transition: 0.25s ease-out;
-    }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    .player::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent);
-      pointer-events: none;
-    }
+.player:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 0 25px rgba(255,255,255,0.15);
+}
 
-    /* ------------------------------
-       BUTTONS (VALORANT STYLE)
-    ------------------------------ */
+/* ===== LOW LIFE ===== */
+.low-life {
+  animation: pulseRed 1.5s infinite;
+}
 
-    button {
-      margin-top: 8px;
-      padding: 12px 15px;
-      font-size: 15px;
-      cursor: pointer;
-      border: 2px solid #ff4655;
-      background: rgba(255,70,85,0.15);
-      border-radius: 6px;
-      color: #fff;
-      transition: 0.2s ease-out;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 10px rgba(255,0,0,0.4); }
+  50% { box-shadow: 0 0 25px rgba(255,0,0,0.8); }
+  100% { box-shadow: 0 0 10px rgba(255,0,0,0.4); }
+}
 
-    button:hover {
-      background: #ff4655;
-      box-shadow: 0 0 12px #ff4655;
-      transform: translateY(-2px);
-    }
+/* ===== ELIMINATED ===== */
+.eliminated {
+  animation: eliminatedAnim 1s forwards;
+}
 
-    .player-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 12px;
-    }
+@keyframes eliminatedAnim {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.5; filter: grayscale(1); }
+}
 
-    .player-actions button {
-      flex: 1;
-      min-width: 120px;
-    }
+/* ===== LIFE FLASH ===== */
+.life-loss {
+  animation: hitFlash 0.6s ease-out;
+}
+.life-gain {
+  animation: healFlash 0.6s ease-out;
+}
 
-    /* ------------------------------
-       NOTIFICATIONS (SLIDE + FADE)
-    ------------------------------ */
+@keyframes hitFlash {
+  0% { background-color: rgba(255,0,0,0.6); transform: scale(1.05); }
+  100% { background-color: rgba(20,20,20,0.7); transform: scale(1); }
+}
 
-    #notifications {
-      margin-top: 20px;
-      width: 100%;
-      max-width: 600px;
-    }
+@keyframes healFlash {
+  0% { background-color: rgba(0,255,0,0.4); transform: scale(1.05); }
+  100% { background-color: rgba(20,20,20,0.7); transform: scale(1); }
+}
 
-    .notif {
-      padding: 12px;
-      margin: 6px 0;
-      border-radius: 6px;
-      font-weight: bold;
-      text-align: center;
-      background: rgba(255,255,255,0.1);
-      animation: notifSlide 0.5s ease-out, notifFade 6s ease-out forwards;
-    }
+/* ===== BUTTON ===== */
+button {
+  margin-top: 8px;
+  padding: 12px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 8px;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s ease;
+}
 
-    @keyframes notifSlide {
-      from { opacity: 0; transform: translateY(-10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+  box-shadow: 0 0 15px rgba(255,255,255,0.3);
+}
 
-    @keyframes notifFade {
-      0% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; }
-    }
+button:active {
+  transform: scale(0.95);
+}
 
-    /* ------------------------------
-       ANIMATIONS VALORANT
-    ------------------------------ */
+button::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.2);
+  top: 0;
+  left: -100%;
+  transition: 0.4s;
+}
+button:hover::after {
+  left: 0;
+}
 
-    /* HIT (impact rouge + shake + flash) */
-    .life-loss {
-      animation: hitFlash 0.22s cubic-bezier(.3,0,.2,1);
-    }
+/* ===== NOTIFICATIONS ===== */
+#notifications {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 600px;
+}
 
-    @keyframes hitFlash {
-      0%   { background: rgba(255,0,40,0.55); transform: scale(1.08) translateX(0); }
-      20%  { transform: scale(1.05) translateX(-4px); }
-      40%  { transform: scale(1.05) translateX(4px); }
-      60%  { transform: scale(1.03) translateX(-2px); }
-      100% { background: rgba(20,20,30,0.85); transform: scale(1) translateX(0); }
-    }
+.notif {
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  animation: notifSlide 0.5s ease;
+}
 
-    /* HEAL (cyan/green glow + smooth scale) */
-    .life-gain {
-      animation: healFlash 0.35s cubic-bezier(.3,0,.2,1);
-    }
-
-    @keyframes healFlash {
-      0%   { background: rgba(0,255,180,0.4); box-shadow: 0 0 20px rgba(0,255,200,0.6); transform: scale(1.05); }
-      100% { background: rgba(20,20,30,0.85); box-shadow: none; transform: scale(1); }
-    }
-
-    @media (max-width: 360px) {
-      button { padding: 10px 12px; font-size: 14px; }
-    }
-
+@keyframes notifSlide {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
   </style>
 </head>
 
 <body>
 
-  <h1 id="duoName"></h1>
+<h1 id="duoName"></h1>
 
-  <h2>Mon binôme</h2>
-  <div id="myTeam"></div>
+<h2>Mon binôme</h2>
+<div id="myTeam"></div>
 
-  <h2>Autres équipes</h2>
-  <div id="otherTeams"></div>
+<h2>Autres équipes</h2>
+<div id="otherTeams"></div>
 
-  <h3>Notifications</h3>
-  <div id="notifications"></div>
+<h3>Notifications</h3>
+<div id="notifications"></div>
 
-  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+<script>
+const BACKEND_URL = "https://the-mask-fight.onrender.com";
+const duoId = (localStorage.getItem("duoId") || "").trim();
+let socket;
 
-  <script>
+if (!duoId) {
+  alert("Aucun binôme détecté, retour au login.");
+  window.location.href = "index.html";
+}
 
-    const BACKEND_URL = "https://the-mask-fight.onrender.com";
-    const duoId = (localStorage.getItem("duoId") || "").trim();
-    let socket;
+/* 🎨 Thèmes */
+const themes = {
+  Bolchevik: { background: "linear-gradient(135deg, #8b0000, #000000)", button: "linear-gradient(135deg, #ff0000, #8b0000)", notif: "#ff4444", darkText: false },
+  JELP: { background: "linear-gradient(135deg, #0033cc, #000000)", button: "linear-gradient(135deg, #0066ff, #0033cc)", notif: "#3399ff", darkText: false },
+  SpawnKill: { background: "linear-gradient(135deg, #d9e4ff, #8fa4d4)", button: "linear-gradient(135deg, #b8c8f0, #6f82b8)", notif: "#dbe3ff", darkText: true },
+  "11br": { background: "linear-gradient(135deg, #ffd700, #000000)", button: "linear-gradient(135deg, #ffea00, #ffd700)", notif: "#ffea00", darkText: true },
+  Yanjacis: { background: "linear-gradient(135deg, #006400, #000000)", button: "linear-gradient(135deg, #00cc00, #006400)", notif: "#00ff00", darkText: false }
+};
 
-    if (!duoId) {
-      alert("Aucun binôme détecté, retour au login.");
-      window.location.href = "index.html";
-    }
+function applyTheme(team) {
+  const style = document.getElementById("dynamic-style");
+  const theme = themes[team];
+  if (!theme) return;
 
-    /* ------------------------------
-       THEMES (SpawnKill amélioré)
-    ------------------------------ */
+  style.innerHTML += `
+    body { background: ${theme.background}; }
+    button { background: ${theme.button}; color: ${theme.darkText ? "#000" : "#fff"}; }
+    .notif { background: ${theme.notif}; color: #000; }
+  `;
+}
 
-    const themes = {
-      Bolchevik: { background: "linear-gradient(135deg,#8b0000,#000)", button: "#ff0000", notif: "#ff4444", darkText: false },
-      JELP: { background: "linear-gradient(135deg,#0033cc,#000)", button: "#0066ff", notif: "#3399ff", darkText: false },
+let previousLives = {};
 
-      /* SpawnKill VALORANT STYLE */
-      SpawnKill: { 
-        background: "linear-gradient(135deg,#dce3ff,#7f8fc7)",
-        button: "#b8c8f0",
-        notif: "#dbe3ff",
-        darkText: true
-      },
+function applyLifeAnimation(container, player) {
+  const old = previousLives[player.id];
 
-      "11br": { background: "linear-gradient(135deg,#ffd700,#000)", button: "#ffea00", notif: "#ffea00", darkText: true },
-      Yanjacis: { background: "linear-gradient(135deg,#006400,#000)", button: "#00cc00", notif: "#00ff00", darkText: false }
-    };
+  if (player.lives === 0) container.classList.add("eliminated");
+  if (player.lives === 1) container.classList.add("low-life");
 
-    function applyTheme(team) {
-      const style = document.getElementById("dynamic-style");
-      const theme = themes[team];
-      if (!theme) return;
+  if (old !== undefined && old !== player.lives) {
+    if (player.lives < old) container.classList.add("life-loss");
+    else container.classList.add("life-gain");
 
-      style.innerHTML += `
-        body { background: ${theme.background}; }
-        button { border-color: ${theme.button}; }
-        .notif { background: ${theme.notif}; color: ${theme.darkText ? "#000" : "#000"}; }
+    setTimeout(() => container.classList.remove("life-loss", "life-gain"), 700);
+  }
+
+  previousLives[player.id] = player.lives;
+}
+
+async function loadPlayers() {
+  const res = await fetch(`${BACKEND_URL}/api/players`);
+  const players = await res.json();
+
+  const myDiv = document.getElementById("myTeam");
+  const otherDiv = document.getElementById("otherTeams");
+  myDiv.innerHTML = "";
+  otherDiv.innerHTML = "";
+
+  const grouped = {};
+  players.forEach(p => {
+    const key = (p.duo || "").trim();
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(p);
+  });
+
+  const myTeamKey = Object.keys(grouped).find(
+    k => k.toLowerCase() === duoId.toLowerCase()
+  );
+
+  if (myTeamKey) {
+    grouped[myTeamKey].forEach(p => {
+      const container = document.createElement("div");
+      container.className = "player";
+      container.innerHTML = `
+        <h3>${p.name}</h3>
+        <p>Vies restantes: ${p.lives}</p>
+        ${p.lives > 0 ? `
+          <div class="player-actions">
+            <button onclick="hit('${p.id}')">Touché</button>
+            <button onclick="heal('${p.id}')">Heal</button>
+          </div>
+        ` : "<p>Éliminé 💀</p>"}
       `;
+      applyLifeAnimation(container, p);
+      myDiv.appendChild(container);
+    });
+    delete grouped[myTeamKey];
+  }
+
+  Object.keys(grouped).forEach(team => {
+    const teamDiv = document.createElement("div");
+    teamDiv.innerHTML = `<h3>${team}</h3>`;
+    grouped[team].forEach(p => {
+      const container = document.createElement("div");
+      container.className = "player";
+      container.innerHTML = `<strong>${p.name}</strong> — Vies restantes: ${p.lives} ${p.lives === 0 ? "💀" : ""}`;
+      applyLifeAnimation(container, p);
+      teamDiv.appendChild(container);
+    });
+    otherDiv.appendChild(teamDiv);
+  });
+}
+
+async function hit(playerId) {
+  await fetch(`${BACKEND_URL}/api/touche`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ playerId, duoId })
+  });
+  loadPlayers();
+}
+
+async function heal(playerId) {
+  await fetch(`${BACKEND_URL}/api/heal`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ playerId, duoId })
+  });
+  loadPlayers();
+}
+
+function initSocket() {
+  socket = io(BACKEND_URL, { transports: ["websocket"] });
+
+  socket.on("notif", (payload) => {
+    let message = "";
+
+    if (payload.type === "hit")
+      message = `⚡ ${payload.duo} - ${payload.player} a perdu une vie (reste ${payload.lives})`;
+    else if (payload.type === "eliminated")
+      message = `💀 ${payload.duo} - ${payload.player} est éliminé !`;
+    else if (payload.type === "heal")
+      message = `💚 ${payload.duo} - ${payload.player} a été soigné (vies: ${payload.lives})`;
+    else if (payload.type === "reset")
+      message = `🔄 ${payload.message}`;
+
+    if (message) {
+      const div = document.createElement("div");
+      div.className = "notif";
+      div.textContent = message;
+      document.getElementById("notifications").prepend(div);
+      loadPlayers();
     }
+  });
+}
 
-    /* ------------------------------
-       ANIMATION MEMORY
-    ------------------------------ */
+(async () => {
+  applyTheme(duoId);
+  document.getElementById("duoName").innerText = `Équipe ${duoId}`;
+  await loadPlayers();
+  initSocket();
 
-    let previousLives = {};
-
-    /* ------------------------------
-       LOAD PLAYERS
-    ------------------------------ */
-
-    async function loadPlayers() {
-      const res = await fetch(`${BACKEND_URL}/api/players`);
-      const players = await res.json();
-
-      const myDiv = document.getElementById("myTeam");
-      const otherDiv = document.getElementById("otherTeams");
-      myDiv.innerHTML = "";
-      otherDiv.innerHTML = "";
-
-      const grouped = {};
-      players.forEach(p => {
-        const key = (p.duo || "").trim();
-        if (!grouped[key]) grouped[key] = [];
-        grouped[key].push(p);
-      });
-
-      const myTeamKey = Object.keys(grouped).find(k => k.toLowerCase() === duoId.toLowerCase());
-
-      function animateLife(container, player) {
-        const old = previousLives[player.id];
-        if (old !== undefined && old !== player.lives) {
-          container.classList.add(player.lives < old ? "life-loss" : "life-gain");
-          setTimeout(() => container.classList.remove("life-loss", "life-gain"), 500);
-        }
-        previousLives[player.id] = player.lives;
-      }
-
-      if (myTeamKey) {
-        grouped[myTeamKey].forEach(p => {
-          const card = document.createElement("div");
-          card.className = "player";
-          card.innerHTML = `
-            <h3>${p.name}</h3>
-            <p>Vies restantes : ${p.lives}</p>
-            ${p.lives > 0 ? `
-              <div class="player-actions">
-                <button onclick="hit('${p.id}')">Touché</button>
-                <button onclick="heal('${p.id}')">Heal</button>
-              </div>
-            ` : "<p>Éliminé 💀</p>"}
-          `;
-          animateLife(card, p);
-          myDiv.appendChild(card);
-        });
-        delete grouped[myTeamKey];
-      }
-
-      Object.keys(grouped).forEach(team => {
-        const teamDiv = document.createElement("div");
-        teamDiv.innerHTML = `<h3>${team}</h3>`;
-        grouped[team].forEach(p => {
-          const card = document.createElement("div");
-          card.className = "player";
-          card.innerHTML = `
-            <strong>${p.name}</strong> — Vies restantes : ${p.lives} ${p.lives === 0 ? "💀" : ""}
-          `;
-          animateLife(card, p);
-          teamDiv.appendChild(card);
-        });
-        otherDiv.appendChild(teamDiv);
-      });
-    }
-
-    /* ------------------------------
-       ACTIONS
-    ------------------------------ */
-
-    async function hit(playerId) {
-      const res = await fetch(`${BACKEND_URL}/api/touche`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, duoId })
-      });
-      const data = await res.json();
-      if (!data.error) loadPlayers();
-    }
-
-    async function heal(playerId) {
-      const res = await fetch(`${BACKEND_URL}/api/heal`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, duoId })
-      });
-      const data = await res.json();
-      if (!data.error) loadPlayers();
-    }
-
-    /* ------------------------------
-       SOCKET NOTIFS
-    ------------------------------ */
-
-    function initSocket() {
-      socket = io(BACKEND_URL, { transports: ["websocket"] });
-
-      socket.on("notif", payload => {
-        let msg = "";
-
-        if (payload.type === "hit") msg = `⚡ ${payload.duo} - ${payload.player} a perdu une vie (${payload.lives})`;
-        if (payload.type === "eliminated") msg = `💀 ${payload.duo} - ${payload.player} est éliminé !`;
-        if (payload.type === "heal") msg = `💚 ${payload.duo} - ${payload.player} a été soigné (${payload.lives})`;
-        if (payload.type === "reset") msg = `🔄 ${payload.message}`;
-
-        if (msg) {
-          const div = document.createElement("div");
-          div.className = "notif";
-          div.textContent = msg;
-          document.getElementById("notifications").prepend(div);
-          loadPlayers();
-        }
-      });
-    }
-
-    /* ------------------------------
-       INIT
-    ------------------------------ */
-
-    (async () => {
-      applyTheme(duoId);
-      document.getElementById("duoName").innerText = `Équipe ${duoId}`;
-      await loadPlayers();
-      initSocket();
-    })();
-
-  </script>
+  setInterval(async () => {
+    try { await fetch(`${BACKEND_URL}/ping`); } catch(e){}
+  }, 60000);
+})();
+</script>
 
 </body>
 </html>
