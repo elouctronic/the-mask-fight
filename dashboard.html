@@ -1,323 +1,563 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <title>Battle Royale IRL</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Style de base -->
-  <style id="base-style">
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #000;
-      color: #eee;
-      padding: 0 10px;
-      box-sizing: border-box;
-      overflow-x: hidden;
-      position: relative;
+  <meta charset="utf-8" />
+  <title>Battle Royale IRL — Liquid Glass UI</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* ---------- Base / Liquid Glass UI ---------- */
+    :root{
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.06);
+      --glass-blur: 8px;
+      --accent-glow: 0 8px 30px rgba(0,0,0,0.6);
+      --max-width: 1100px;
     }
 
-    /* Calque d’animation */
-    #animated-bg {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-      pointer-events: none;
-      opacity: 0.45;
-      background: transparent;
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      background:#000;
+      color:#eee;
+      display:flex;
+      justify-content:center;
+      padding:24px;
+      box-sizing:border-box;
     }
 
-    h1 { text-align: center; margin: 15px 0; font-size: 1.5rem; }
-    h2 { margin-top: 20px; margin-bottom: 10px; font-size: 1.3rem; }
-    h3 { margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+    .app {
+      width:100%;
+      max-width:var(--max-width);
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:24px;
+      align-items:start;
+    }
 
+    header.app-header{
+      grid-column:1 / -1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:18px 20px;
+      border-radius:14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid var(--card-border);
+      backdrop-filter: blur(var(--glass-blur));
+      box-shadow: var(--accent-glow);
+    }
+
+    header h1{
+      margin:0;
+      font-size:1.25rem;
+      letter-spacing:0.4px;
+    }
+
+    /* ---------- Panels (glass cards) ---------- */
+    .panel{
+      border-radius:12px;
+      padding:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border:1px solid var(--card-border);
+      backdrop-filter: blur(var(--glass-blur));
+      box-shadow: 0 6px 30px rgba(0,0,0,0.6);
+    }
+
+    .left {
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .right {
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    h2 { margin:0 0 8px 0; font-size:1.05rem; color:inherit; }
+    h3 { margin:0 0 6px 0; font-size:0.98rem; color:inherit; }
+
+    /* ---------- Player card (liquid) ---------- */
     .player {
-      border: 1px solid #444;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 8px;
-      background: rgba(20,20,20,0.8);
-      box-shadow: 0 0 10px rgba(0,0,0,0.6);
-      width: 100%;
-      box-sizing: border-box;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.04);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5) inset;
     }
 
-    button {
-      margin-top: 8px;
-      padding: 12px 15px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-right: 8px;
-      border: none;
-      border-radius: 6px;
-      color: #fff;
-      transition: 0.3s;
-      min-height: 44px;
+    .player .meta {
+      display:flex;
+      flex-direction:column;
+      gap:4px;
     }
 
-    #notifications { margin-top: 20px; width: 100%; max-width: 600px; }
-    .notif { padding: 10px; margin: 5px 0; border-radius: 5px; font-weight: bold; text-align: center; }
+    .player .meta .name { font-weight:700; font-size:1rem; }
+    .player .meta .lives { font-size:0.9rem; opacity:0.9; }
 
-    .player-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
+    /* ---------- Buttons: liquid, animated, ripple ---------- */
+    .btn {
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:0.3px;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      overflow:hidden;
+      min-height:44px;
+      user-select:none;
     }
 
-    .player-actions button { flex: 1; min-width: 120px; }
+    .btn:active { transform: translateY(1px) scale(.995); }
+
+    /* ripple pseudo-element */
+    .btn::after{
+      content:"";
+      position:absolute;
+      width:0; height:0;
+      border-radius:50%;
+      transform: translate(-50%,-50%);
+      pointer-events:none;
+      transition: width .45s ease, height .45s ease, opacity .45s ease;
+      opacity:0;
+      background: rgba(255,255,255,0.25);
+    }
+
+    .btn.ripple:active::after{
+      width:220px; height:220px; opacity:1;
+    }
+
+    /* subtle 3D hover */
+    .btn:hover{
+      transform: translateY(-4px) scale(1.02);
+      filter:brightness(1.05);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+    }
+
+    /* small helpers */
+    .muted { opacity:0.85; font-weight:600; font-size:0.95rem; }
+    .stack { display:flex; flex-direction:column; gap:10px; }
+
+    /* notifications */
+    #notifications { display:flex; flex-direction:column; gap:8px; max-height:320px; overflow:auto; padding-right:6px; }
+    .notif { padding:10px 12px; border-radius:8px; font-weight:700; color:#000; background:rgba(255,255,255,0.85); box-shadow:0 6px 18px rgba(0,0,0,0.35); }
+
+    /* responsive */
+    @media (max-width:980px){
+      .app { grid-template-columns: 1fr; }
+      .right { order:2; }
+    }
   </style>
 
-  <!-- Style dynamique (thèmes + animations) -->
-  <style id="dynamic-style"></style>
+  <style id="theme-style"></style>
 </head>
-
 <body>
-  <div id="animated-bg"></div>
+  <div class="app">
+    <header class="app-header panel">
+      <h1 id="duoName">Battle Royale IRL</h1>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button id="refreshBtn" class="btn ripple" title="Rafraîchir">⟳ Rafraîchir</button>
+        <button id="pingBtn" class="btn ripple" title="Ping serveur">● Ping</button>
+      </div>
+    </header>
 
-  <h1 id="duoName"></h1>
+    <main class="left">
+      <section class="panel">
+        <h2>Mon binôme</h2>
+        <div id="myTeam" class="stack"></div>
+      </section>
 
-  <h2>Mon binôme</h2>
-  <div id="myTeam"></div>
+      <section class="panel">
+        <h2>Autres équipes</h2>
+        <div id="otherTeams" class="stack"></div>
+      </section>
+    </main>
 
-  <h2>Autres équipes</h2>
-  <div id="otherTeams"></div>
+    <aside class="right">
+      <section class="panel">
+        <h2>Actions</h2>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button id="resetBtn" class="btn ripple">Reset vies</button>
+          <button id="reloadBtn" class="btn ripple">Reload DB (dev)</button>
+        </div>
+      </section>
 
-  <h3>Notifications</h3>
-  <div id="notifications"></div>
+      <section class="panel">
+        <h2>Notifications</h2>
+        <div id="notifications"></div>
+      </section>
+    </aside>
+  </div>
+
+  <div id="animated-bg" aria-hidden="true"></div>
 
   <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
   <script>
-    const BACKEND_URL = "https://the-mask-fight.onrender.com";
+    /* ---------- Config ---------- */
+    const BACKEND_URL = "https://the-mask-fight.onrender.com"; // adapte si besoin
     const duoId = (localStorage.getItem("duoId") || "").trim();
-    let socket;
+    if(!duoId){ alert("Aucun binôme détecté — retour au login."); location.href="index.html"; }
 
-    if (!duoId) {
-      alert("Aucun binôme détecté, retour au login.");
-      window.location.href = "index.html";
-    }
-
-    /* 🎨 Thèmes + animations stylées */
-    const themes = {
+    /* ---------- Theme definitions (Liquid Glass UI, stylized animated backgrounds) ---------- */
+    const THEMES = {
       Bolchevik: {
-        background: "linear-gradient(135deg, #4a0000, #000000)",
-        button: "#ff3333",
-        notif: "#ff4444",
-        text: "#fff",
-        animation: `
-          #animated-bg {
-            background: radial-gradient(circle, rgba(255,0,0,0.25), transparent);
-            animation: smoke 6s infinite alternate ease-in-out;
+        name:"Bolchevik",
+        bgGradient: "linear-gradient(135deg,#4a0000,#000000)",
+        btnBg: "linear-gradient(180deg,#ff4d4d,#b30000)",
+        btnText: "#fff",
+        notifBg: "linear-gradient(90deg,#ffb3b3,#ff4d4d)",
+        animatedCSS: `
+          #animated-bg{
+            background:
+              radial-gradient(800px 400px at 10% 20%, rgba(255,40,40,0.12), transparent 10%),
+              radial-gradient(600px 300px at 90% 80%, rgba(255,10,10,0.08), transparent 10%);
+            animation: bolchMove 8s ease-in-out infinite;
+            opacity:0.55;
           }
-          @keyframes smoke {
-            0% { transform: translate(-40px, -40px) scale(1); }
-            100% { transform: translate(40px, 40px) scale(1.5); }
+          @keyframes bolchMove{
+            0%{ transform: translateY(0) scale(1); filter: blur(6px); }
+            50%{ transform: translateY(-18px) scale(1.05); filter: blur(10px); }
+            100%{ transform: translateY(0) scale(1); filter: blur(6px); }
           }
         `
       },
 
       JELP: {
-        background: "linear-gradient(135deg, #001a66, #000000)",
-        button: "#0066ff",
-        notif: "#3399ff",
-        text: "#fff",
-        animation: `
-          #animated-bg {
-            background: linear-gradient(120deg, rgba(0,120,255,0.35), transparent);
+        name:"JELP",
+        bgGradient: "linear-gradient(135deg,#001a66,#000000)",
+        btnBg: "linear-gradient(180deg,#4da6ff,#0033cc)",
+        btnText: "#fff",
+        notifBg: "linear-gradient(90deg,#99ccff,#4da6ff)",
+        animatedCSS: `
+          #animated-bg{
+            background:
+              linear-gradient(120deg, rgba(0,120,255,0.18), transparent 40%),
+              radial-gradient(600px 300px at 20% 80%, rgba(0,200,255,0.06), transparent 10%);
             background-size: 200% 200%;
-            animation: waves 5s infinite ease-in-out;
+            animation: jelpWave 6s ease-in-out infinite;
+            opacity:0.55;
           }
-          @keyframes waves {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
+          @keyframes jelpWave{
+            0%{ background-position:0% 50%; transform: translateX(-8px); }
+            50%{ background-position:100% 50%; transform: translateX(8px); }
+            100%{ background-position:0% 50%; transform: translateX(-8px); }
           }
         `
       },
 
       SpawnKill: {
-        background: "linear-gradient(135deg, #444444, #000000)",
-        button: "#ffffff",
-        notif: "#ffffff",
-        text: "#000",
-        animation: `
-          #animated-bg {
-            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(0,0,0,0.15));
-            background-size: 200% 200%;
-            animation: spawnkillWave 6s ease-in-out infinite;
+        name:"SpawnKill",
+        bgGradient: "linear-gradient(135deg,#3a3a3a,#000000)", // modern grey -> black
+        btnBg: "#ffffff", // white buttons
+        btnText: "#000000", // black text on buttons
+        notifBg: "linear-gradient(90deg,#ffffff,#e6e6e6)",
+        animatedCSS: `
+          #animated-bg{
+            background:
+              linear-gradient(135deg, rgba(255,255,255,0.08), rgba(0,0,0,0.08)),
+              radial-gradient(800px 300px at 10% 10%, rgba(255,255,255,0.04), transparent 10%),
+              radial-gradient(600px 200px at 90% 90%, rgba(0,0,0,0.06), transparent 10%);
+            background-size: 300% 300%;
+            animation: spawnGlass 8s ease-in-out infinite;
+            opacity:0.55;
           }
-          @keyframes spawnkillWave {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+          @keyframes spawnGlass{
+            0%{ background-position:0% 50%; transform: translateY(0) scale(1); filter: blur(2px); }
+            50%{ background-position:100% 50%; transform: translateY(-10px) scale(1.02); filter: blur(4px); }
+            100%{ background-position:0% 50%; transform: translateY(0) scale(1); filter: blur(2px); }
           }
         `
       },
 
       "11br": {
-        background: "linear-gradient(135deg, #665500, #000000)",
-        button: "#ffdd00",
-        notif: "#ffea00",
-        text: "#000",
-        animation: `
-          #animated-bg {
-            background: radial-gradient(circle, rgba(255,230,0,0.3), transparent);
-            animation: pulse 2s infinite ease-in-out;
+        name:"11br",
+        bgGradient: "linear-gradient(135deg,#665500,#000000)",
+        btnBg: "linear-gradient(180deg,#ffea00,#ffcc00)",
+        btnText: "#000000",
+        notifBg: "linear-gradient(90deg,#fff2a6,#ffd700)",
+        animatedCSS: `
+          #animated-bg{
+            background:
+              radial-gradient(700px 300px at 30% 30%, rgba(255,230,0,0.18), transparent),
+              radial-gradient(500px 200px at 80% 80%, rgba(255,200,0,0.08), transparent);
+            animation: elevenPulse 2.8s ease-in-out infinite;
+            opacity:0.55;
           }
-          @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.3; }
-            100% { transform: scale(1.4); opacity: 0.5; }
+          @keyframes elevenPulse{
+            0%{ transform: scale(1); opacity:0.35; }
+            50%{ transform: scale(1.25); opacity:0.55; }
+            100%{ transform: scale(1); opacity:0.35; }
           }
         `
       },
 
       Yanjacis: {
-        background: "linear-gradient(135deg, #003300, #000000)",
-        button: "#00cc00",
-        notif: "#00ff00",
-        text: "#fff",
-        animation: `
-          #animated-bg {
-            background: radial-gradient(circle, rgba(0,255,0,0.25), transparent);
-            animation: particles 3s infinite ease-in-out;
+        name:"Yanjacis",
+        bgGradient: "linear-gradient(135deg,#003300,#000000)",
+        btnBg: "linear-gradient(180deg,#00cc44,#007700)",
+        btnText: "#fff",
+        notifBg: "linear-gradient(90deg,#a6ffb3,#00ff66)",
+        animatedCSS: `
+          #animated-bg{
+            background:
+              radial-gradient(700px 300px at 20% 80%, rgba(0,255,0,0.12), transparent),
+              linear-gradient(120deg, rgba(0,200,0,0.06), transparent);
+            animation: yanjaFloat 5s ease-in-out infinite;
+            opacity:0.55;
           }
-          @keyframes particles {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-40px); }
+          @keyframes yanjaFloat{
+            0%{ transform: translateY(0); }
+            50%{ transform: translateY(-22px); }
+            100%{ transform: translateY(0); }
           }
         `
       }
     };
 
-    function applyTheme(team) {
-      const theme = themes[team];
-      if (!theme) return;
-
-      const dyn = document.getElementById("dynamic-style");
-      dyn.innerHTML = `
-        body { background: ${theme.background}; color: ${theme.text}; }
-        button { background: ${theme.button}; color: ${theme.text}; }
-        .notif { background: ${theme.notif}; color: #000; }
-        ${theme.animation}
+    /* ---------- Apply theme (inject CSS) ---------- */
+    function applyTheme(key){
+      const theme = THEMES[key] || THEMES["SpawnKill"];
+      const style = document.getElementById("theme-style");
+      style.innerHTML = `
+        body { background: ${theme.bgGradient}; color: ${theme.btnText === "#000000" ? "#eaeaea" : "#fff"}; }
+        header.app-header { border-color: rgba(255,255,255,0.06); }
+        .player { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); }
+        .btn { background: ${theme.btnBg}; color: ${theme.btnText}; box-shadow: 0 8px 30px rgba(0,0,0,0.45); }
+        #notifications .notif { background: ${theme.notifBg}; color: ${theme.btnText === "#000000" ? "#000" : "#000";} }
+        ${theme.animatedCSS}
       `;
+      // ensure animated-bg visible
+      document.getElementById("animated-bg").style.opacity = "0.55";
     }
 
-    /* --- Le reste du code (inchangé) --- */
-
-    async function loadPlayers() {
-      const res = await fetch(`${BACKEND_URL}/api/players`);
-      const players = await res.json();
-
-      const myDiv = document.getElementById("myTeam");
-      const otherDiv = document.getElementById("otherTeams");
-      myDiv.innerHTML = "";
-      otherDiv.innerHTML = "";
-
-      const grouped = {};
-      players.forEach(p => {
-        const key = (p.duo || "").trim();
-        if (!grouped[key]) grouped[key] = [];
-        grouped[key].push(p);
+    /* ---------- Utilities: create element helpers ---------- */
+    function el(tag, props = {}, children = []) {
+      const node = document.createElement(tag);
+      Object.entries(props).forEach(([k,v]) => {
+        if(k === "class") node.className = v;
+        else if(k === "html") node.innerHTML = v;
+        else node.setAttribute(k, v);
       });
+      (Array.isArray(children) ? children : [children]).forEach(c => {
+        if(!c) return;
+        node.append(typeof c === "string" ? document.createTextNode(c) : c);
+      });
+      return node;
+    }
 
-      const myTeamKey = Object.keys(grouped).find(
-        k => k.toLowerCase() === duoId.toLowerCase()
-      );
+    /* ---------- Fetch & render players ---------- */
+    async function loadPlayers(){
+      try{
+        const res = await fetch(`${BACKEND_URL}/api/players`);
+        const players = await res.json();
 
-      if (myTeamKey) {
-        grouped[myTeamKey].forEach(p => {
-          const container = document.createElement("div");
-          container.className = "player";
-          container.innerHTML = `
-            <h3>${p.name}</h3>
-            <p>Vies restantes: ${p.lives}</p>
-            ${p.lives > 0 ? `
-              <div class="player-actions">
-                <button onclick="hit('${p.id}')">Touché</button>
-                <button onclick="heal('${p.id}')">Heal</button>
-              </div>
-            ` : "<p>Éliminé 💀</p>"}
-          `;
-          myDiv.appendChild(container);
+        const grouped = {};
+        players.forEach(p => {
+          const key = (p.duo || "").trim();
+          if(!grouped[key]) grouped[key] = [];
+          grouped[key].push(p);
         });
-        delete grouped[myTeamKey];
+
+        // my team
+        const myKey = Object.keys(grouped).find(k => k.toLowerCase() === duoId.toLowerCase());
+        const myTeamEl = document.getElementById("myTeam");
+        myTeamEl.innerHTML = "";
+        if(myKey){
+          grouped[myKey].forEach(p => {
+            const card = el("div",{class:"player"}, [
+              el("div",{class:"meta"}, [
+                el("div",{class:"name"}, p.name),
+                el("div",{class:"lives muted"}, `Vies : ${p.lives}`)
+              ]),
+              el("div",{}, [
+                p.lives > 0
+                  ? el("div",{class:"player-actions"}, [
+                      createActionButton("Touché", ()=> hit(p.id)),
+                      createActionButton("Heal", ()=> heal(p.id))
+                    ])
+                  : el("div",{}, el("span",{class:"muted"},"Éliminé 💀"))
+              ])
+            ]);
+            myTeamEl.appendChild(card);
+          });
+          delete grouped[myKey];
+        } else {
+          myTeamEl.appendChild(el("div",{}, "Aucune équipe trouvée pour ce binôme."));
+        }
+
+        // other teams
+        const otherEl = document.getElementById("otherTeams");
+        otherEl.innerHTML = "";
+        Object.keys(grouped).forEach(team => {
+          const teamBlock = el("div",{}, [
+            el("h3",{}, team),
+            ...grouped[team].map(p => el("div",{class:"player"}, [
+              el("div",{class:"meta"}, [
+                el("div",{class:"name"}, p.name),
+                el("div",{class:"lives muted"}, `Vies : ${p.lives}`)
+              ]),
+              el("div",{}, p.lives === 0 ? el("span",{}, "💀") : "")
+            ]))
+          ]);
+          otherEl.appendChild(teamBlock);
+        });
+
+      }catch(err){
+        console.error("Erreur loadPlayers", err);
+        notify("Erreur: impossible de charger les joueurs", "error");
       }
+    }
 
-      Object.keys(grouped).forEach(team => {
-        const teamDiv = document.createElement("div");
-        teamDiv.innerHTML = `<h3>${team}</h3>`;
-        grouped[team].forEach(p => {
-          const container = document.createElement("div");
-          container.className = "player";
-          container.innerHTML = `
-            <strong>${p.name}</strong> — Vies restantes: ${p.lives}
-            ${p.lives === 0 ? " 💀" : ""}
-          `;
-          teamDiv.appendChild(container);
+    /* ---------- Buttons factory with ripple coordinates ---------- */
+    function createActionButton(label, onClick){
+      const btn = el("button",{class:"btn ripple"}, label);
+      btn.addEventListener("click", (e)=>{
+        // ripple coordinates for pseudo-element
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        btn.style.setProperty("--x", x + "px");
+        btn.style.setProperty("--y", y + "px");
+        onClick();
+      });
+      // small keyboard accessibility
+      btn.addEventListener("keydown", (e)=>{ if(e.key === "Enter" || e.key === " ") { e.preventDefault(); btn.click(); }});
+      return btn;
+    }
+
+    /* ---------- API actions: hit / heal / reset / reload ---------- */
+    async function hit(playerId){
+      try{
+        const res = await fetch(`${BACKEND_URL}/api/touche`, {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ playerId, duoId })
         });
-        otherDiv.appendChild(teamDiv);
-      });
+        const data = await res.json();
+        if(data.error) return notify(data.error, "error");
+        notify(`Touché: ${data.playerId || playerId} → vies: ${data.lives}`, "info");
+        await loadPlayers();
+      }catch(e){ notify("Erreur touche", "error"); }
     }
 
-    async function hit(playerId) {
-      const res = await fetch(`${BACKEND_URL}/api/touche`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, duoId })
-      });
-      const data = await res.json();
-      if (data.error) return alert(data.error);
-      loadPlayers();
+    async function heal(playerId){
+      try{
+        const res = await fetch(`${BACKEND_URL}/api/heal`, {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ playerId, duoId })
+        });
+        const data = await res.json();
+        if(data.error) return notify(data.error, "error");
+        notify(`Heal appliqué → vies: ${data.lives}`, "success");
+        await loadPlayers();
+      }catch(e){ notify("Erreur heal", "error"); }
     }
 
-    async function heal(playerId) {
-      const res = await fetch(`${BACKEND_URL}/api/heal`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerId, duoId })
-      });
-      const data = await res.json();
-      if (data.error) return alert(data.error);
-      loadPlayers();
+    async function resetAll(){
+      if(!confirm("Réinitialiser toutes les vies et heals ?")) return;
+      try{
+        const res = await fetch(`${BACKEND_URL}/api/reset`, { method:"POST" });
+        const data = await res.json();
+        if(data.error) return notify(data.error, "error");
+        notify("Reset effectué", "success");
+        await loadPlayers();
+      }catch(e){ notify("Erreur reset", "error"); }
     }
 
-    function initSocket() {
-      socket = io(BACKEND_URL, { transports: ["websocket"] });
-      socket.on("notif", (payload) => {
-        let message = "";
+    async function reloadDB(){
+      if(!confirm("Supprime et réinsère les seeds depuis server.js ? (dev only)")) return;
+      try{
+        const res = await fetch(`${BACKEND_URL}/api/reload`, { method:"POST" });
+        const data = await res.json();
+        if(data.error) return notify(data.error, "error");
+        notify("DB rechargée", "success");
+        await loadPlayers();
+      }catch(e){ notify("Erreur reload", "error"); }
+    }
 
-        if (payload.type === "hit") {
-          message = `⚡ ${payload.duo} - ${payload.player} a perdu une vie (reste ${payload.lives})`;
-        } else if (payload.type === "eliminated") {
-          message = `💀 ${payload.duo} - ${payload.player} est éliminé !`;
-        } else if (payload.type === "heal") {
-          message = `💚 ${payload.duo} - ${payload.player} a été soigné (vies: ${payload.lives})`;
-        } else if (payload.type === "reset") {
-          message = `🔄 ${payload.message}`;
-        }
+    /* ---------- Notifications UI ---------- */
+    function notify(text, type="info"){
+      const container = document.getElementById("notifications");
+      const node = el("div",{class:"notif"}, text);
+      container.prepend(node);
+      setTimeout(()=> {
+        node.style.transition = "opacity .6s ease, transform .6s ease";
+        node.style.opacity = "0";
+        node.style.transform = "translateY(-8px)";
+        setTimeout(()=> node.remove(), 700);
+      }, 4200);
+    }
 
-        if (message) {
-          const div = document.createElement("div");
-          div.className = "notif";
-          div.textContent = message;
-          document.getElementById("notifications").prepend(div);
+    /* ---------- Socket.IO realtime ---------- */
+    let socket;
+    function initSocket(){
+      try{
+        socket = io(BACKEND_URL, { transports:["websocket"] });
+        socket.on("connect", ()=> console.log("socket connected", socket.id));
+        socket.on("notif", payload => {
+          if(!payload) return;
+          if(payload.type === "hit") notify(`⚡ ${payload.duo} — ${payload.player} a perdu une vie (reste ${payload.lives})`);
+          else if(payload.type === "eliminated") notify(`💀 ${payload.duo} — ${payload.player} est éliminé !`);
+          else if(payload.type === "heal") notify(`💚 ${payload.duo} — ${payload.player} a été soigné (vies: ${payload.lives})`);
+          else if(payload.type === "reset") notify(`🔄 ${payload.message}`);
           loadPlayers();
-        }
-      });
+        });
+      }catch(e){ console.warn("Socket init failed", e); }
     }
 
-    (async () => {
-      applyTheme(duoId);
+    /* ---------- Wire UI controls ---------- */
+    document.getElementById("refreshBtn").addEventListener("click", ()=> loadPlayers());
+    document.getElementById("pingBtn").addEventListener("click", async ()=>{
+      try{ await fetch(`${BACKEND_URL}/ping`); notify("Ping OK"); }catch(e){ notify("Ping failed","error"); }
+    });
+    document.getElementById("resetBtn").addEventListener("click", resetAll);
+    document.getElementById("reloadBtn").addEventListener("click", reloadDB);
+
+    /* ---------- Init ---------- */
+    (async function init(){
       document.getElementById("duoName").innerText = `Équipe ${duoId}`;
+      applyTheme(duoId);
       await loadPlayers();
       initSocket();
     })();
+
+    /* ---------- Helper: choose theme key robustly ---------- */
+    function applyTheme(duoKey){
+      // match ignoring case and small differences
+      const found = Object.keys(THEMES).find(k => k.toLowerCase() === duoKey.toLowerCase());
+      const key = found || duoKey || "SpawnKill";
+      applyTheme = (k)=> { // replace function with final implementation to avoid re-eval
+        const theme = THEMES[k] || THEMES["SpawnKill"];
+        const style = document.getElementById("theme-style");
+        style.innerHTML = `
+          /* global theme */
+          body { background: ${theme.bgGradient}; color: ${theme.text || "#fff"}; }
+          header.app-header { border-color: rgba(255,255,255,0.06); }
+          .player { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); }
+          .btn { background: ${theme.btnBg}; color: ${theme.btnText || theme.btnText === undefined ? "#fff" : theme.btnText}; }
+          #notifications .notif { background: ${theme.notifBg}; color: ${theme.btnText === "#000000" ? "#000" : "#000";} }
+          ${theme.animatedCSS}
+        `;
+        document.getElementById("animated-bg").style.opacity = "0.55";
+      };
+      applyTheme(key);
+    }
   </script>
 </body>
 </html>
