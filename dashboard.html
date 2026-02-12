@@ -17,26 +17,25 @@
       color: #eee;
       padding: 0 10px;
       box-sizing: border-box;
+      overflow-x: hidden;
+      position: relative;
     }
-    
-    h1 { 
-      text-align: center; 
-      margin: 15px 0;
-      font-size: 1.5rem;
+
+    /* Calque d’animation */
+    #animated-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.35;
     }
-    
-    h2 { 
-      margin-top: 20px; 
-      margin-bottom: 10px;
-      font-size: 1.3rem;
-    }
-    
-    h3 {
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-    }
-    
+
+    h1 { text-align: center; margin: 15px 0; font-size: 1.5rem; }
+    h2 { margin-top: 20px; margin-bottom: 10px; font-size: 1.3rem; }
+    h3 { margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; }
+
     .player {
       border: 1px solid #444;
       padding: 12px;
@@ -47,7 +46,7 @@
       width: 100%;
       box-sizing: border-box;
     }
-    
+
     button {
       margin-top: 8px;
       padding: 12px 15px;
@@ -58,80 +57,40 @@
       border-radius: 6px;
       color: #fff;
       transition: 0.3s;
-      min-height: 44px; /* Taille minimale pour les écrans tactiles */
+      min-height: 44px;
     }
-    
-    #notifications { 
-      margin-top: 20px; 
-      width: 100%;
-      max-width: 600px;
-    }
-    
-    .notif {
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 5px;
-      font-weight: bold;
-      text-align: center;
-    }
-    
-    /* Disposition des boutons pour mobile */
+
+    #notifications { margin-top: 20px; width: 100%; max-width: 600px; }
+    .notif { padding: 10px; margin: 5px 0; border-radius: 5px; font-weight: bold; text-align: center; }
+
     .player-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 10px;
     }
-    
-    .player-actions button {
-      flex: 1;
-      min-width: 120px;
-    }
-    
-    /* Améliorations pour les écrans plus larges */
+
+    .player-actions button { flex: 1; min-width: 120px; }
+
     @media (min-width: 768px) {
-      body {
-        padding: 0 20px;
-      }
-      
-      h1 {
-        font-size: 2rem;
-        margin-top: 25px;
-      }
-      
-      h2 {
-        font-size: 1.5rem;
-        margin-top: 30px;
-      }
-      
-      .player {
-        padding: 15px;
-        margin: 10px 0;
-      }
-      
-      .player-actions {
-        flex-wrap: nowrap;
-      }
+      body { padding: 0 20px; }
+      h1 { font-size: 2rem; margin-top: 25px; }
+      h2 { font-size: 1.5rem; margin-top: 30px; }
+      .player { padding: 15px; margin: 10px 0; }
+      .player-actions { flex-wrap: nowrap; }
     }
-    
-    /* Améliorations pour les très petits écrans */
+
     @media (max-width: 360px) {
-      h1 {
-        font-size: 1.3rem;
-      }
-      
-      h2 {
-        font-size: 1.1rem;
-      }
-      
-      button {
-        padding: 10px 12px;
-        font-size: 14px;
-      }
+      h1 { font-size: 1.3rem; }
+      h2 { font-size: 1.1rem; }
+      button { padding: 10px 12px; font-size: 14px; }
     }
   </style>
 </head>
+
 <body>
+  <div id="animated-bg"></div>
+
   <h1 id="duoName"></h1>
 
   <h2>Mon binôme</h2>
@@ -149,32 +108,117 @@
     const duoId = (localStorage.getItem("duoId") || "").trim();
     let socket;
 
-    // Sécurité: si pas de duoId, on renvoie vers le login
     if (!duoId) {
       alert("Aucun binôme détecté, retour au login.");
       window.location.href = "index.html";
     }
 
-    // Thèmes par équipe
+    /* 🎨 Thèmes + animations */
     const themes = {
-      violette: { background: "linear-gradient(135deg, #6a0dad, #000000)", button: "linear-gradient(135deg, #a64ca6, #6a0dad)", notif: "#a64ca6" },
-      bleue:   { background: "linear-gradient(135deg, #1e3c72, #000000)", button: "linear-gradient(135deg, #2575fc, #1e3c72)", notif: "#2575fc" },
-      rouge:   { background: "linear-gradient(135deg, #8b0000, #000000)", button: "linear-gradient(135deg, #ff0000, #8b0000)", notif: "#ff4444" },
-      orange:  { background: "linear-gradient(135deg, #ff8c00, #000000)", button: "linear-gradient(135deg, #ffa500, #ff8c00)", notif: "#ffa500" },
-      verte:   { background: "linear-gradient(135deg, #006400, #000000)", button: "linear-gradient(135deg, #00ff00, #006400)", notif: "#00ff00" }
+      Bolchevik: {
+        background: "linear-gradient(135deg, #8b0000, #000000)",
+        button: "linear-gradient(135deg, #ff0000, #8b0000)",
+        notif: "#ff4444",
+        darkText: false,
+        animation: `
+          #animated-bg {
+            background: radial-gradient(circle, rgba(255,0,0,0.4), transparent);
+            animation: smoke 6s infinite alternate ease-in-out;
+          }
+          @keyframes smoke {
+            0% { transform: translate(-20px, -20px) scale(1); }
+            100% { transform: translate(20px, 20px) scale(1.3); }
+          }
+        `
+      },
+
+      JELP: {
+        background: "linear-gradient(135deg, #0033cc, #000000)",
+        button: "linear-gradient(135deg, #0066ff, #0033cc)",
+        notif: "#3399ff",
+        darkText: false,
+        animation: `
+          #animated-bg {
+            background: linear-gradient(120deg, rgba(0,80,255,0.4), transparent);
+            animation: waves 5s infinite linear;
+          }
+          @keyframes waves {
+            0% { transform: translateX(-50px); }
+            100% { transform: translateX(50px); }
+          }
+        `
+      },
+
+      SpawnKill: {
+        background: "linear-gradient(135deg, #ffffff, #cccccc)",
+        button: "linear-gradient(135deg, #eeeeee, #bbbbbb)",
+        notif: "#ffffff",
+        darkText: true,
+        animation: `
+          #animated-bg {
+            background: repeating-linear-gradient(
+              90deg,
+              rgba(255,255,255,0.3) 0px,
+              rgba(255,255,255,0.3) 2px,
+              transparent 2px,
+              transparent 4px
+            );
+            animation: glitch 0.8s infinite;
+          }
+          @keyframes glitch {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
+          }
+        `
+      },
+
+      "11br": {
+        background: "linear-gradient(135deg, #ffd700, #000000)",
+        button: "linear-gradient(135deg, #ffea00, #ffd700)",
+        notif: "#ffea00",
+        darkText: true,
+        animation: `
+          #animated-bg {
+            background: radial-gradient(circle, rgba(255,230,0,0.4), transparent);
+            animation: pulse 2s infinite ease-in-out;
+          }
+          @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.3); opacity: 0.5; }
+          }
+        `
+      },
+
+      Yanjacis: {
+        background: "linear-gradient(135deg, #006400, #000000)",
+        button: "linear-gradient(135deg, #00cc00, #006400)",
+        notif: "#00ff00",
+        darkText: false,
+        animation: `
+          #animated-bg {
+            background: radial-gradient(circle, rgba(0,255,0,0.3), transparent);
+            animation: particles 3s infinite ease-in-out;
+          }
+          @keyframes particles {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-40px); }
+          }
+        `
+      }
     };
 
     function applyTheme(team) {
       const style = document.getElementById("dynamic-style");
-      const theme = themes[team.toLowerCase()];
-      if (theme) {
-        style.innerHTML += `
-          body { background: ${theme.background}; }
-          button { background: ${theme.button}; }
-          button:hover { filter: brightness(1.2); }
-          .notif { background: ${theme.notif}; color: #000; }
-        `;
-      }
+      const theme = themes[team];
+      if (!theme) return;
+
+      style.innerHTML += `
+        body { background: ${theme.background}; }
+        button { background: ${theme.button}; color: ${theme.darkText ? "#000" : "#fff"}; }
+        .notif { background: ${theme.notif}; color: ${theme.darkText ? "#000" : "#000"}; }
+        ${theme.animation}
+      `;
     }
 
     async function loadPlayers() {
@@ -186,7 +230,6 @@
       myDiv.innerHTML = "";
       otherDiv.innerHTML = "";
 
-      // Grouper par binôme
       const grouped = {};
       players.forEach(p => {
         const key = (p.duo || "").trim();
@@ -194,12 +237,10 @@
         grouped[key].push(p);
       });
 
-      // Trouver la clé correspondant à mon équipe (comparaison en minuscules)
       const myTeamKey = Object.keys(grouped).find(
         k => k.toLowerCase() === duoId.toLowerCase()
       );
 
-      // Mon binôme avec boutons
       if (myTeamKey) {
         grouped[myTeamKey].forEach(p => {
           const container = document.createElement("div");
@@ -216,11 +257,9 @@
           `;
           myDiv.appendChild(container);
         });
-        // Supprimer mon équipe du regroupement
         delete grouped[myTeamKey];
       }
 
-      // Autres équipes sans boutons
       Object.keys(grouped).forEach(team => {
         const teamDiv = document.createElement("div");
         teamDiv.innerHTML = `<h3>${team}</h3>`;
@@ -244,10 +283,7 @@
         body: JSON.stringify({ playerId, duoId })
       });
       const data = await res.json();
-      if (data.error) {
-        alert(data.error);
-        return;
-      }
+      if (data.error) return alert(data.error);
       loadPlayers();
     }
 
@@ -258,10 +294,7 @@
         body: JSON.stringify({ playerId, duoId })
       });
       const data = await res.json();
-      if (data.error) {
-        alert(data.error);
-        return;
-      }
+      if (data.error) return alert(data.error);
       loadPlayers();
     }
 
@@ -302,21 +335,14 @@
       });
     }
 
-    // Initialisation
     (async () => {
       applyTheme(duoId);
       document.getElementById("duoName").innerText = `Équipe ${duoId}`;
       await loadPlayers();
       initSocket();
 
-      // auto-ping toutes les minutes pour garder le serveur actif
       setInterval(async () => {
-        try {
-          await fetch(`${BACKEND_URL}/ping`);
-          console.log("Ping envoyé pour garder le serveur actif");
-        } catch (e) {
-          console.error("Erreur de ping", e);
-        }
+        try { await fetch(`${BACKEND_URL}/ping`); } catch (e) {}
       }, 60000);
     })();
   </script>
